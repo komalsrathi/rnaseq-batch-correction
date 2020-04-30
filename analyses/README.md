@@ -1,4 +1,7 @@
+#### Purpose
 Location of all relevant DMG/HGG project workflows. 
+
+#### Structure
 Should be arranged thematically with the following example structure: 
 
 ```./analyses/TMB/input```
