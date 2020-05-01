@@ -16,29 +16,29 @@ Rscript -e "rmarkdown::render('analyses/mutational_signatures/run_mutational_sig
 
 ### Input:
   maf:
-    label: "Input maf file"
-    value: analyses/mutational_signatures/input/pbta-snv-consensus-mutation.maf.tsv.gz
-    input: file
+  - label: "Input maf file"
+  - value: analyses/mutational_signatures/input/pbta-snv-consensus-mutation.maf.tsv.gz
+  - input: file
 
   wgs_bed:
-    label: "Input WGS bed"
-    value: analyses/mutational_signatures/input/WGS.hg38.strelka2.unpadded.bed
-    input: file
+  - label: "Input WGS bed"
+  - value: analyses/mutational_signatures/input/WGS.hg38.strelka2.unpadded.bed
+  - input: file
 
   wxs_bed:
-    label: "Input WXS bed"
-    value: analyses/mutational_signatures/input/WXS.hg38.100bp_padded.bed
-    input: file
+  - label: "Input WXS bed"
+  - value: analyses/mutational_signatures/input/WXS.hg38.100bp_padded.bed
+  - input: file
 
   metadata_df: 
-    label: "Input metadata"
-    value: analyses/mutational_signatures/input/pbta-histologies.tsv
-    input: file 
+  - label: "Input metadata"
+  - value: analyses/mutational_signatures/input/pbta-histologies.tsv
+  - input: file 
 
   palettes_gradient:
-    label: "Input pallete"
-    value: analyses/mutational_signatures/input/gradient_color_palette.tsv
-    input: file
+  - label: "Input pallete"
+  - value: analyses/mutational_signatures/input/gradient_color_palette.tsv
+  - input: file
 
 
 ### Functions:
