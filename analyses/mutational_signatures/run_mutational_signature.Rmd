@@ -1,0 +1,102 @@
+---
+title: "Mutational Signature"
+output: html_notebook
+params:
+  maf:
+    label: "Input maf file"
+    value: analyses/mutational_signatures/input/pbta-snv-consensus-mutation.maf.tsv.gz
+    input: file
+  wgs_bed:
+    label: "Input WGS bed"
+    value: analyses/mutational_signatures/input/WGS.hg38.strelka2.unpadded.bed
+    input: file
+  wxs_bed:
+    label: "Input WXS bed"
+    value: analyses/mutational_signatures/input/WXS.hg38.100bp_padded.bed
+    input: file
+  metadata_df: 
+    label: "Input metadata"
+    value: analyses/mutational_signatures/input/pbta-histologies.tsv
+    input: file 
+  palettes_gradient:
+    label: "Input pallete"
+    value: analyses/mutational_signatures/input/gradient_color_palette.tsv
+    input: file
+      
+author: Krutika Gaonkar
+
+---
+
+### Read in input and install packages
+```{r}
+# rootdir
+root_dir <- rprojroot::find_root(rprojroot::has_dir(".git"))
+setwd(root_dir)
+
+# check if packages are available if not download 
+  if (!("deconstructSigs" %in% installed.packages())) {
+    install.packages("deconstructSigs")
+  }
+  if (!("tidyverse" %in% installed.packages())){
+    install.packages("tidyverse")
+  }
+
+# load required packages
+suppressPackageStartupMessages(library("tidyverse"))
+suppressPackageStartupMessages(library("deconstructSigs"))
+
+# read putative oncogene fusion files
+maf<-read_tsv(file.path(root_dir,params$maf)) %>% as.data.frame()
+
+# read in wgs bed
+wgs_bed<-file.path(root_dir,params$wgs_bed)
+
+# read in wes bed
+wxs_bed<-file.path(root_dir,params$wxs_bed)
+
+# read in metadata
+metadata_df<-read_tsv(file.path(root_dir,params$metadata_df),guess_max = 10000) %>%
+  dplyr::rename(Tumor_Sample_Barcode = "Kids_First_Biospecimen_ID") %>%
+  dplyr::select("Tumor_Sample_Barcode", "experimental_strategy", "short_histology") %>%
+  # Easier to deal with NA short histologies if they are labeled something different
+  dplyr::mutate(short_histology = as.character(tidyr::replace_na(short_histology, "none"))) 
+
+```
+
+
+### Step 1. Run deconstructSigs for samples in given maf file
+```{r}
+# source because not running as a package yet
+source(file.path(root_dir,"analyses","mutational_signatures","code","run_deconstructSigs.R"))
+deconstructSigs_output<-run_deconstructSigs(maf=maf,wgs_bed=wgs_bed,wxs_bed=wxs_bed, metadata_df=metadata_df,grouping_by = "short_histology")
+```
+
+```{r}
+write_tsv(deconstructSigs_output, file.path(root_dir,"analyses","mutational_signatures","output","deconstructSigs_cosmic.tsv"))
+
+```
+
+Set up gradient color palette for the bubble matrix plots. 
+
+```{r}
+gradient_col_palette <- readr::read_tsv(file.path(root_dir,params$palettes_gradient))
+
+# Won't need NA color this time. 
+gradient_col_palette <- gradient_col_palette %>%
+  dplyr::filter(color_names != "na_color")
+```
+
+### Step 2. Bubble plot per short histology
+```{r}
+
+bubble_matrix_plot(deconstructSigs_output, 
+                   label = "COSMIC Signatures", 
+                   color_palette = gradient_col_palette$hex_codes,grouping_by = "short_histology"
+                   ) + ggsave(
+  file.path(root_dir,"analyses","mutational_signatures","output", "bubble_matrix_cosmic_mutation_sig.png"),
+  width = 30, height = 20, units = "cm")
+
+```
+
+
+
