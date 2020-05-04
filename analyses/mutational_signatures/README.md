@@ -4,9 +4,7 @@
 
 This analysis evaluates mutational signatures of the [consensus SNV callers file](https://github.com/AlexsLemonade/OpenPBTA-analysis/tree/master/analyses/snv-callers#consensus-mutation-call).
 
-Here the signatures from [COSMIC signatures](https://cancer.sanger.ac.uk/cosmic)
-and[Alexandrov et al, 2013](https://www.ncbi.nlm.nih.gov/pubmed/23945592) are
-evaluated for all samples using [deconstructSigs](https://github.com/raerose01/deconstructSigs).
+Here the signatures from [COSMIC signatures](https://cancer.sanger.ac.uk/cosmic) is evaluated for all samples using [deconstructSigs](https://github.com/raerose01/deconstructSigs) . To run for signatures from [Alexandrov et al, 2013](https://www.ncbi.nlm.nih.gov/pubmed/23945592) please change signatures="nature2013" while running run_deconstructSigs()  
 
 ### Run:
 ```
@@ -53,7 +51,7 @@ Rscript -e "rmarkdown::render('analyses/mutational_signatures/run_mutational_sig
 
 ### Functions:
 **run_deconstructSigs()**
-Reads in maf file and runs deconstructSigs ( [mut.to.sigs.input()](https://github.com/raerose01/deconstructSigs#muttosigsinput) and  [whichSignatures()](https://github.com/raerose01/deconstructSigs#whichsignatures)) to get a list of weights per signature for each sample.
+Reads in maf file and runs deconstructSigs ( [mut.to.sigs.input()](https://github.com/raerose01/deconstructSigs#muttosigsinput) and  [whichSignatures()](https://github.com/raerose01/deconstructSigs#whichsignatures)) to get a list of weights per signature from [COSMIC signatures](https://cancer.sanger.ac.uk/cosmic) (signatures="cosmic" [Default]) for each sample.
 
 **bubble_matrix_plot()**
 Reads in data.frame from run_deconstructSigs() and plots bubble plots for a given grouping (short_histology [Default]). If is_sample=TRUE is given as parameter then a heatmap with color coded mutational signature weights are provided for each sample.
