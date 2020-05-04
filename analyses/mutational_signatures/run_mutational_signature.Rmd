@@ -29,7 +29,11 @@ params:
   grouping_by:
     label: "subgroup in metadata"
     value: short_histology
-    input: string  
+    input: string
+  signatures:
+    label: "deconstructSigs provided signatures :cosmic or nature2013"
+    value: cosmic
+    input: string   
           
 author: Krutika Gaonkar
 
@@ -69,6 +73,9 @@ metadata_df<-read_tsv(file.path(root_dir,params$metadata_df),guess_max = 10000) 
   # Easier to deal with NA short histologies if they are labeled something different
   dplyr::mutate(short_histology = as.character(tidyr::replace_na(short_histology, "none"))) 
 
+# read in signature param
+signatures<-params$signatures
+
 # source functions to make them available in this notebook; maybe be called as functions is package is built around this
 # step1 run deconstructSigs from maf to signature matrix
 source(file.path(root_dir,"analyses","mutational_signatures","code","run_deconstructSigs.R"))
@@ -83,11 +90,11 @@ source(file.path(root_dir,"analyses","mutational_signatures","code","grouped_sig
 
 ### Step 1. Run deconstructSigs for samples in given maf file
 ```{r}
-deconstructSigs_output<-run_deconstructSigs(maf=maf,wgs_bed=wgs_bed,wxs_bed=wxs_bed, metadata_df=metadata_df,grouping_by = "short_histology")
+deconstructSigs_output<-run_deconstructSigs(maf=maf,wgs_bed=wgs_bed,wxs_bed=wxs_bed, metadata_df=metadata_df,grouping_by = "short_histology",signatures=signatures)
 ```
 
 ```{r}
-write_tsv(deconstructSigs_output, file.path(root_dir,"analyses","mutational_signatures","output","deconstructSigs_cosmic.tsv"))
+write_tsv(deconstructSigs_output, file.path(root_dir,"analyses","mutational_signatures","output",paste0("deconstructSigs_",signatures,".tsv")))
 
 ```
 
@@ -105,11 +112,12 @@ gradient_col_palette <- gradient_col_palette %>%
 
 ```{r}
 # plot and save
+label<-paste(signatures,"Signatures")
 bubble_matrix_plot(deconstructSigs_output, 
-                   label = "COSMIC Signatures", 
+                   label = label, 
                    color_palette = gradient_col_palette$hex_codes,grouping_by = "short_histology"
                    ) + ggsave(
-  file.path(root_dir,"analyses","mutational_signatures","output", "bubble_matrix_cosmic_mutation_sig.png"),
+  file.path(root_dir,"analyses","mutational_signatures","output", paste0("bubble_matrix_",signatures,"_mutation_sig.png")),
   width = 30, height = 20, units = "cm")
 
 ```
@@ -121,10 +129,10 @@ per_sample<-deconstructSigs_output %>% dplyr::filter(Tumor_Sample_Barcode %in% c
 
 # plot and save
 bubble_matrix_plot(per_sample, 
-                   label = "Cosmic", 
+                   label = label, 
                    color_palette = gradient_col_palette$hex_codes,grouping_by = "short_histology"
                    ,is_sample = TRUE) + ggsave(
-  file.path(root_dir,"analyses","mutational_signatures","output", "bubble_matrix_cosmic_mutation_sig_BS_1Q524P3B_BS_9DM8H1RX.png"),
+  file.path(root_dir,"analyses","mutational_signatures","output", paste0("bubble_matrix_",signatures,"_mutation_sig_BS_1Q524P3B_BS_9DM8H1RX.png")),
   width = 8, height = 20, units = "cm")
 
 ```
@@ -145,7 +153,7 @@ lapply(unique(deconstructSigs_output$short_histology),
   sig_num_df = deconstructSigs_output_primary,
   grouping_by = "short_histology",
   output_dir = file.path(root_dir,"analyses","mutational_signatures","output", "signature_grouped_barplots"), 
-  label = "cosmic"
+  label = label
 )
 
 ```

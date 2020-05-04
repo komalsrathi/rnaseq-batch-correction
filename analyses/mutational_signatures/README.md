@@ -4,11 +4,19 @@
 
 This analysis evaluates mutational signatures of the [consensus SNV callers file](https://github.com/AlexsLemonade/OpenPBTA-analysis/tree/master/analyses/snv-callers#consensus-mutation-call).
 
-Here the signatures from [COSMIC signatures](https://cancer.sanger.ac.uk/cosmic) is evaluated for all samples using [deconstructSigs](https://github.com/raerose01/deconstructSigs) . To run for signatures from [Alexandrov et al, 2013](https://www.ncbi.nlm.nih.gov/pubmed/23945592) please change signatures="nature2013" while running run_deconstructSigs()  
+Here the signatures from [COSMIC signatures](https://cancer.sanger.ac.uk/cosmic) is evaluated for all samples using [deconstructSigs](https://github.com/raerose01/deconstructSigs) . 
 
 ### Run:
 ```
 Rscript -e "rmarkdown::render('analyses/mutational_signatures/run_mutational_signature.Rmd',clean = TRUE)"
+
+```
+
+To run for signatures from [Alexandrov et al, 2013](https://www.ncbi.nlm.nih.gov/pubmed/23945592) 
+
+### Run:
+```
+Rscript -e "rmarkdown::render('analyses/mutational_signatures/run_mutational_signature.Rmd',params= list( signatures= "\"nature2013\""),clean = TRUE)"
 
 ```
 
@@ -48,6 +56,10 @@ Rscript -e "rmarkdown::render('analyses/mutational_signatures/run_mutational_sig
   - value: short_histology
   - input: string
 
+  signatures:
+  - label: "deconstructSigs provided signatures :cosmic or nature2013"
+  - value: cosmic
+  - input: string
 
 ### Functions:
 **run_deconstructSigs()**
