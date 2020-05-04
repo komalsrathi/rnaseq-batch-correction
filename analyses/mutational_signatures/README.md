@@ -46,5 +46,7 @@ Rscript -e "rmarkdown::render('analyses/mutational_signatures/run_mutational_sig
 Reads in maf file and runs deconstructSigs ( [mut.to.sigs.input()](https://github.com/raerose01/deconstructSigs#muttosigsinput) and  [whichSignatures()](https://github.com/raerose01/deconstructSigs#whichsignatures)) to get a list of weights per signature for each sample.
 
 **bubble_matrix_plot()**
-Reads in data.frame from run_deconstructSigs() and plots bubble plots for a given grouping (short_histology [Default])
+Reads in data.frame from run_deconstructSigs() and plots bubble plots for a given grouping (short_histology [Default]). If is_sample=TRUE is given as parameter then a heatmap with color coded mutational signature weights are provided for each sample.
 
+**grouped_sig_barplot()**
+Reads in data.frame from run_deconstructSigs() and plots barplot for each sample in a given grouping (short_histology [Default])

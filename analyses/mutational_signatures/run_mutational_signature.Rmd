@@ -22,7 +22,15 @@ params:
     label: "Input pallete"
     value: analyses/mutational_signatures/input/gradient_color_palette.tsv
     input: file
-      
+  ind_sample:
+    label: "Input sample list"
+    value: analyses/mutational_signatures/input/independent-specimens.wgswxs.primary.tsv
+    input: file
+  grouping_by:
+    label: "subgroup in metadata"
+    value: short_histology
+    input: string  
+          
 author: Krutika Gaonkar
 
 ---
@@ -61,13 +69,20 @@ metadata_df<-read_tsv(file.path(root_dir,params$metadata_df),guess_max = 10000) 
   # Easier to deal with NA short histologies if they are labeled something different
   dplyr::mutate(short_histology = as.character(tidyr::replace_na(short_histology, "none"))) 
 
+# source functions to make them available in this notebook; maybe be called as functions is package is built around this
+# step1 run deconstructSigs from maf to signature matrix
+source(file.path(root_dir,"analyses","mutational_signatures","code","run_deconstructSigs.R"))
+# step2 plot matrix plots
+source(file.path(root_dir,"analyses","mutational_signatures","code","bubble_matrix_plots.R"))
+# step3 plot signature barplot for all samples per group
+source(file.path(root_dir,"analyses","mutational_signatures","code","grouped_sigs_barplot.R"))
+
+
 ```
 
 
 ### Step 1. Run deconstructSigs for samples in given maf file
 ```{r}
-# source because not running as a package yet
-source(file.path(root_dir,"analyses","mutational_signatures","code","run_deconstructSigs.R"))
 deconstructSigs_output<-run_deconstructSigs(maf=maf,wgs_bed=wgs_bed,wxs_bed=wxs_bed, metadata_df=metadata_df,grouping_by = "short_histology")
 ```
 
@@ -87,8 +102,9 @@ gradient_col_palette <- gradient_col_palette %>%
 ```
 
 ### Step 2. Bubble plot per short histology
-```{r}
 
+```{r}
+# plot and save
 bubble_matrix_plot(deconstructSigs_output, 
                    label = "COSMIC Signatures", 
                    color_palette = gradient_col_palette$hex_codes,grouping_by = "short_histology"
@@ -97,6 +113,43 @@ bubble_matrix_plot(deconstructSigs_output,
   width = 30, height = 20, units = "cm")
 
 ```
+
+### Example run for given list of samples
+```{r}
+# random selection of 2 HGAT samples
+per_sample<-deconstructSigs_output %>% dplyr::filter(Tumor_Sample_Barcode %in% c("BS_1Q524P3B","BS_9DM8H1RX"))
+
+# plot and save
+bubble_matrix_plot(per_sample, 
+                   label = "Cosmic", 
+                   color_palette = gradient_col_palette$hex_codes,grouping_by = "short_histology"
+                   ,is_sample = TRUE) + ggsave(
+  file.path(root_dir,"analyses","mutational_signatures","output", "bubble_matrix_cosmic_mutation_sig_BS_1Q524P3B_BS_9DM8H1RX.png"),
+  width = 8, height = 20, units = "cm")
+
+```
+
+
+### Step 3. Barplot plot per short histology
+```{r}
+# Keep only primary tumors
+ind_samples <- readr::read_tsv(file.path(root_dir,params$ind_sample))
+
+# filter run_deconstructSigs() output
+deconstructSigs_output_primary <- deconstructSigs_output %>%
+  dplyr::filter(Tumor_Sample_Barcode %in% ind_samples$Kids_First_Biospecimen_ID)
+
+# Make grouped bar plots
+lapply(unique(deconstructSigs_output$short_histology),
+  grouped_sig_barplot,
+  sig_num_df = deconstructSigs_output_primary,
+  grouping_by = "short_histology",
+  output_dir = file.path(root_dir,"analyses","mutational_signatures","output", "signature_grouped_barplots"), 
+  label = "cosmic"
+)
+
+```
+
 
 
 
