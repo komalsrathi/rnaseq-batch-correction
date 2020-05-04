@@ -40,6 +40,16 @@ Rscript -e "rmarkdown::render('analyses/mutational_signatures/run_mutational_sig
   - value: analyses/mutational_signatures/input/gradient_color_palette.tsv
   - input: file
 
+  ind_sample:
+  - label: "Input sample list"
+  - value: analyses/mutational_signatures/input/independent-specimens.wgswxs.primary.tsv
+  - input: file
+  
+  grouping_by:
+  - label: "subgroup in metadata"
+  - value: short_histology
+  - input: string
+
 
 ### Functions:
 **run_deconstructSigs()**
