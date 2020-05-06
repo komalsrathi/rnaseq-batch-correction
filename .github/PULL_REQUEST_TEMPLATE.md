@@ -26,6 +26,8 @@ Please describe the tests that you ran to verify your changes. Provide instructi
 * Environment:
 * Test files:
 
+**Task link/Screenshot/Terminal returns**:
+
 ## Checklist:
 
 - [ ] My code follows the style guidelines of this project
