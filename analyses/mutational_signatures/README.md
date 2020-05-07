@@ -4,62 +4,42 @@
 
 This analysis evaluates mutational signatures of the [consensus SNV callers file](https://github.com/AlexsLemonade/OpenPBTA-analysis/tree/master/analyses/snv-callers#consensus-mutation-call).
 
-Here the signatures from [COSMIC signatures](https://cancer.sanger.ac.uk/cosmic) is evaluated for all samples using [deconstructSigs](https://github.com/raerose01/deconstructSigs) . 
+Here the signatures from [COSMIC signatures](https://cancer.sanger.ac.uk/cosmic) or signatures from [Alexandrov et al, 2013](https://www.ncbi.nlm.nih.gov/pubmed/23945592) are evaluated for all samples using [deconstructSigs](https://github.com/raerose01/deconstructSigs) . 
 
-### Run:
+### Run script:
 ```
-Rscript -e "rmarkdown::render('analyses/mutational_signatures/run_mutational_signature.Rmd',clean = TRUE)"
+Rscript run_mutational_signature.R --help
+
+Options:
+	-i MAF, --maf=MAF
+		Input maf file
+
+	-w WGS_BED, --wgs_bed=WGS_BED
+		Input WGS bed
+
+	-x WXS_BED, --wxs_bed=WXS_BED
+		Input WXS bed
+
+	-m METADATA_DF, --metadata_df=METADATA_DF
+		Input metadata
+
+	-p PALETTES_GRADIENT, --palettes_gradient=PALETTES_GRADIENT
+		Input pallete
+
+	-d IND_SAMPLE, --ind_sample=IND_SAMPLE
+		Input sample list
+
+	-g GROUPING_BY, --grouping_by=GROUPING_BY
+		Subgroup in metadata
+
+	-s SIGNATURES, --signatures=SIGNATURES
+		deconstructSigs signatures :cosmic or nature2013
+
+	-h, --help
+		Show this help message and exit
 
 ```
 
-To run for signatures from [Alexandrov et al, 2013](https://www.ncbi.nlm.nih.gov/pubmed/23945592) 
-
-### Run:
-```
-Rscript -e "rmarkdown::render('analyses/mutational_signatures/run_mutational_signature.Rmd',params= list( signatures= "\"nature2013\""),clean = TRUE)"
-
-```
-
-### Input:
-  maf:
-  - label: "Input maf file"
-  - value: analyses/mutational_signatures/input/pbta-snv-consensus-mutation.maf.tsv.gz
-  - input: file
-
-  wgs_bed:
-  - label: "Input WGS bed"
-  - value: analyses/mutational_signatures/input/WGS.hg38.strelka2.unpadded.bed
-  - input: file
-
-  wxs_bed:
-  - label: "Input WXS bed"
-  - value: analyses/mutational_signatures/input/WXS.hg38.100bp_padded.bed
-  - input: file
-
-  metadata_df: 
-  - label: "Input metadata"
-  - value: analyses/mutational_signatures/input/pbta-histologies.tsv
-  - input: file 
-
-  palettes_gradient:
-  - label: "Input pallete"
-  - value: analyses/mutational_signatures/input/gradient_color_palette.tsv
-  - input: file
-
-  ind_sample:
-  - label: "Input sample list"
-  - value: analyses/mutational_signatures/input/independent-specimens.wgswxs.primary.tsv
-  - input: file
-  
-  grouping_by:
-  - label: "subgroup in metadata"
-  - value: short_histology
-  - input: string
-
-  signatures:
-  - label: "deconstructSigs provided signatures :cosmic or nature2013"
-  - value: cosmic
-  - input: string
 
 ### Functions:
 **run_deconstructSigs()**
