@@ -25,7 +25,7 @@ option_list <- list(
     opt_str = "--outdir",
     default = file.path(getwd(), "out"),
     type = "character",
-    help="Output directory path."
+    help = "Output directory path."
   ),
   make_option(
     opt_str = "--exclude",
@@ -47,16 +47,16 @@ option_list <- list(
     metavar = "character"
   ),
   make_option(
-    opt_str = "--exclude_genes",
+    opt_str = "--palette",
     type = "character",
-    default = NA,
-
+    help = "File path to the palette file for coloring the plots.",
+    metavar = "character"
   ),
   make_option(
     opt_str = "--scripts",
     default = file.path(getwd(), "scripts"),
     type = "character",
-    help="Scripts directory path."
+    help = "Scripts directory path."
   )
 )
 
@@ -65,6 +65,7 @@ max_genes <- 50
 min_vaf <- 0.05 #minimum vaf for inclusion
 min_mutated <- 5 #Number of samples that have to have mutation for it to be included
 min_depth <- 0 #minimum depth of coverage
+plot_size <- 50
 
 #parse options
 opts <- parse_args(OptionParser(option_list = option_list))
@@ -74,6 +75,7 @@ maf_file <- file.path(opts$maf)
 out_dir <- file.path(opts$outdir)
 exclude_file <- file.path(opts$exclude)
 script_dir <- file.path(opts$scripts)
+pallette_file <- file.path(opts$palette)
 print(meta_file)
 print(out_dir)
 print(script_dir)
@@ -82,6 +84,15 @@ print(script_dir)
 #we might only need the one file, so it might be better to take
 #the path to that script not the folder
 source(file.path(script_dir, "cooccur_functions.R"))
+
+#set up color palette
+divergent_palette <- readr::read_tsv(pallette_file, col_types = readr::cols())
+divergent_colors <- divergent_palette %>%
+  dplyr::filter(color_names != "na_color") %>%
+  dplyr::pull(hex_codes)
+na_color <- divergent_palette %>%
+  dplyr::filter(color_names == "na_color") %>%
+  dplyr::pull(hex_codes)
 
 #create output directories
 figure_dir <- file.path(out_dir, "figures")
@@ -92,14 +103,14 @@ dir.create(file_dir)
 
 #set up diseases
 diseases <- hash(
-"all"="All",
-"Medulloblastoma"="Medulloblastoma",
-"LGAT"="Low-grade astrocytic tumor",
-"Ependymoma"="Ependymoma",
-"HGAT"="High-grade glioma",
-"DMG"="Diffuse midline glioma",
-"Ganglioglioma"="Ganglioglioma",
-"Craniopharyngioma"="Craniopharyngioma"
+"all" = "All",
+"Medulloblastoma" = "Medulloblastoma",
+"LGAT" = "Low-grade astrocytic tumor",
+"Ependymoma" = "Ependymoma",
+"HGAT" = "High-grade glioma",
+"DMG" = "Diffuse midline glioma",
+"Ganglioglioma" = "Ganglioglioma",
+"Craniopharyngioma" = "Craniopharyngioma"
 )
 
 #read inputs
@@ -184,16 +195,15 @@ include <- nonsynonymous # always want nonsyn
 #}
 
 #run analysis for each disease
-for (diseaseID in keys(diseases))
-  {
-  print(diseaseID)
-  full_diseaseID <- diseases[[diseaseID]]
-  print(full_diseaseID)
+for (disease_id in keys(diseases)) {
+  print(disease_id)
+  full_disease_id <- diseases[[disease_id]]
+  print(full_disease_id)
   #filter for samples with the disease
   disease_df <- meta_df %>%
     dplyr::filter(Kids_First_Biospecimen_ID %in% sample_df$Kids_First_Biospecimen_ID) %>%
-    dplyr::filter(tolower(full_diseaseID) == "all" |
-      tolower(integrated_diagnosis) == tolower(full_diseaseID)) %>%
+    dplyr::filter(tolower(full_disease_id) == "all" |
+      tolower(integrated_diagnosis) == tolower(full_disease_id)) %>%
     dplyr::select(Kids_First_Participant_ID, Kids_First_Biospecimen_ID)
 
   #filter metadata to chosen samples
@@ -255,12 +265,195 @@ for (diseaseID in keys(diseases))
     desc(mean_muts_per_sample)
   )
 
+  #reduce cooccur summary to needed fields
+  cooccur_df <- cooccur_summary %>%
+    dplyr::mutate(
+    mut1 = mut11 + mut10,
+    mut2 = mut11 + mut01,
+    label1 = paste0(gene1, " (", mut1, ")"),
+    label2 = paste0(gene2, " (", mut2, ")")
+  )
+
+  labels <- unique(c(cooccur_df$label1, cooccur_df$label2))
+
+  #check the order of the labels to be decreasing by mut count
+  label_counts <- as.numeric(stringr::str_extract(labels, "\\b\\d+\\b"))
+  labels <- labels[order(label_counts, decreasing = TRUE)]
+  #order genes the same way, in case we want to use those
+  genes <- stringr::str_extract(labels, "^.+?\\b")
+  genes <- genes[order(label_counts, decreasing = TRUE)]
+
+  cooccur_df <- cooccur_df %>%
+    dplyr::mutate(
+    gene1 = factor(gene1, levels = genes),
+    gene2 = factor(gene2, levels = genes),
+    label1 = factor(label1, levels = labels),
+    label2 = factor(label2, levels = labels)
+  )
+
+  #create scales for consistent sizing
+  #The scales will need to have plot_size elements,
+  #so after getting the unique list, we concatenate on extra elements.
+  #for convenience, these are just numbers 1:n
+  #where n is the number of extra labels needed for the scale
+  xscale <- cooccur_df$label1 %>%
+    as.character() %>%
+    unique() %>%
+    c(1:(plot_size - length(.)))
+  yscale <- cooccur_df$label2 %>%
+    as.character() %>%
+    unique() %>%
+    #the concatenated labels need to be at the front of the Y scale,
+    #since this will be at the bottom in the plot.
+    c(1:(plot_size - length(.)), .)
+
+    #make cooccur plot
+    cooccur_plot <- ggplot(
+      cooccur_df,
+      aes(x = label1, y = label2, fill = cooccur_score)
+    ) +
+      geom_tile(width = 0.7, height = 0.7) +
+      scale_x_discrete(
+        position = "top",
+        limits = xscale,
+        breaks = unique(cooccur_df$label1)
+      ) + # blank unused sections.
+      scale_y_discrete(
+        limits = yscale,
+        breaks = unique(cooccur_df$label2)
+      ) +
+      scale_fill_gradientn(
+        colors = divergent_colors,
+        na.value = na_color,
+        limits = c(-10, 10),
+        oob = scales::squish,
+      ) +
+      labs(
+        x = "",
+        y = "",
+        fill = "Co-occurence\nscore"
+      ) +
+      theme_classic() +
+      theme(
+        aspect.ratio = 1,
+        axis.text.x = element_text(
+          angle = -90,
+          hjust = 1,
+          size = 6
+        ),
+        axis.text.y = element_text(size = 6),
+        axis.line = element_blank(),
+        axis.ticks = element_blank(),
+        legend.justification = c(1, 0),
+        legend.position = c(1, 0),
+        legend.key.size = unit(2, "char")
+      )
+  plot_file <- file.path(figure_dir, paste("cooccur.", disease_id, ".png", sep = ""))
+  print(plot_file)
+  ggsave(cooccur_plot, filename = plot_file)
+
+  #Make gene by disease chart.
+  #this part needs to be adapted and changed.
+  #the original code is calling the gene_disease_counts disease_df
+  #this new code is using a different disease_df
+  #disease_df_save <- disease_df #save full disease_df for printing later.
+  disease_gene_df <- gene_disease_counts %>%
+    dplyr::mutate(gene = factor(gene, levels = genes))
+  display_diseases <- disease_gene_df %>%
+    dplyr::group_by(disease) %>%
+    dplyr::tally(wt = mutant_samples) %>%
+    dplyr::arrange(desc(n)) %>%
+    head(7) %>% # seven so we end up with 8 total for color reasons
+    dplyr::pull(disease)
+  disease_gene_df <- disease_gene_df %>%
+    dplyr::mutate(disease_factor =
+      forcats::fct_other(disease, keep = display_diseases) %>%
+      forcats::fct_relevel(display_diseases)
+    )
+  xscale2 <- levels(disease_gene_df$gene) %>%
+      c(rep("", plot_size - length(.)))
+  disease_plot <- ggplot(
+    disease_gene_df,
+    aes(x = gene, y = mutant_samples, fill = disease_factor)) +
+    geom_col(width = 0.7) +
+    labs(
+      x = "",
+      y = "Samples with mutations",
+      fill = "Diagnosis"
+      ) +
+    colorblindr::scale_fill_OkabeIto() +
+    scale_x_discrete(
+      limits = xscale2,
+      breaks = disease_gene_df$gene
+    ) +
+    scale_y_continuous(expand = c(0, 0.5, 0.1, 0)) +
+    theme_classic() +
+    theme(
+      axis.text.x = element_text(
+        angle = 90,
+        hjust = 1,
+        vjust = 0.5
+      ),
+      legend.position = c(1, 1),
+      legend.justification = c(1, 1),
+      legend.key.size = unit(1, "char"))
+  #save disease plot
+  disease_fig <- file.path(figure_dir, paste("gene_disease.", disease_id, ".png", sep = ""))
+  print(disease_fig)
+  ggsave(disease_plot, filename = disease_fig)
+
+  #Make combined plot.
+  #labels for y axis will be gene names, with extra spaces (at bottom) blank
+  ylabels  <- cooccur_df$gene2 %>%
+    as.character() %>%
+    unique() %>%
+    c(rep("", plot_size - length(.)), .)
+  cooccur_plot2 <- cooccur_plot +
+    scale_x_discrete(
+      limits = xscale,
+      breaks = c()
+    ) +
+    scale_y_discrete(
+      limits = yscale,
+      labels = ylabels
+    ) +
+    theme(
+      plot.margin = unit(c(-3.5, 0, 0, 0), "char")# negative top margin to move plots together
+    )
+  #Move labels and themes for disease plot
+  disease_plot2 <- disease_plot +
+    theme(
+      axis.text.x = element_text(
+        angle = -90,
+        hjust = 1,
+        vjust = 0.5
+      ),
+      axis.title.y = element_text(
+        vjust = -10# keep the label close when combined
+      )
+    )
+
+  #Combine plots with <patchwork>
+  #Layout of the two plots will be one over the other (1 column),
+  #with the upper plot 3/4 the height of the lower plot
+  combined_plot <- disease_plot2 + cooccur_plot2 +
+    plot_layout(ncol = 1, heights = c(3, 4)) +
+    plot_annotation(tag_levels = "A") &
+    theme(#add uniform labels
+      axis.text.x = element_text(size = 9),
+      axis.text.y = element_text(size = 9)
+    )
+  #save combined plot.
+  combined_fig <- file.path(figure_dir, paste("combined.", disease_id, ".png", sep = ""))
+  print(combined_fig)
+  ggsave(combined_plot, filename = combined_fig, width = 8, height = 14)
+
   #write outputs
-  disease_file <- file.path(file_dir, paste(diseaseID, ".tsv", sep=''))
+  disease_file <- file.path(file_dir, paste(disease_id, ".tsv", sep = ""))
   readr::write_tsv(disease_df, disease_file)
-  cooc_file <- file.path(file_dir, paste("cooccur.", diseaseID, ".tsv", sep=''))
+  cooc_file <- file.path(file_dir, paste("cooccur.", disease_id, ".tsv", sep = ""))
   readr::write_tsv(cooccur_summary, cooc_file)
-  gene_disease_file <- file.path(file_dir, paste("gene_disease.", diseaseID, ".tsv", sep=''))
+  gene_disease_file <- file.path(file_dir, paste("gene_disease.", disease_id, ".tsv", sep = ""))
   readr::write_tsv(gene_disease_counts, gene_disease_file)
   }
 
