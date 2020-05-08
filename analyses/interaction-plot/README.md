@@ -40,4 +40,24 @@ Options:
 
 #### Inputs
 
+##### Disease List
+
+The script will analyze all samples together into one co-occurrence plot, and it will also analyze samples and mutations and generate co-ocurrence plots for the following disease list:
+
+* Medulloblastoma
+* Low-grade astrocytic tumor
+* Ependymoma
+* High-grade glioma
+* Diffuse midline glioma
+* Ganglioglioma
+* Craniopharyngioma
+
 #### Outputs
+
+The script outputs a series of plots and files used to generate the plots for each disease type above and for all diseases present in the metadata file. The output directory will have two sub-directories: "figures" which will contain the plots that are generated and "files" which will contain the intermediate files used to generate the plots. Each type will have the following files and plots:
+* Disease file: tab separated values file with sample ids of samples with the disease
+* Gene Disease file: tab separated values file with a list of genes and count of samples with mutations in each gene.
+* Co-occurrence file: tab separated values file with a list of gene pairs and the co-occurrence score of each pair.
+* Co-occurrence plot: plot showing the pairwise co-occurrence of every mutated gene
+* Gene disease plot: a bar plot depicted the mutated genes and the number of samples with mutations in each gene.
+* Combined plot: both plots combined into a single figure.
