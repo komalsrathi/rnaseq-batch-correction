@@ -32,4 +32,8 @@ This analysis computes tumor mutation burden for different disease types
    `Output` 
    ![](output/pbta-snv-mutect2.TMB.png)
 
+   Cumulative  distribution function of the same fig
+
+   ![](output/pbta-snv-mutect2.CFD.TMB.png)
+
 

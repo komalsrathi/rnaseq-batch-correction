@@ -1,0 +1,22 @@
+## Input file names
+#
+MAFfile=
+targetBED=
+cdsBED=
+METADATAFILE=
+
+## String inputs 
+#
+DISEASECOL=
+SAMPLECOL=
+MAFDATABASENAME=
+DATABASETABLENAME=
+
+
+##  Output filenames
+INTERSECTBEDNAME=
+TMB_OUT=
+INTERSECTBEDNAME=
+OUTPLOTNAME=
+
+

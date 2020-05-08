@@ -21,7 +21,7 @@
 # conda install -c anaconda pandas
 # conda install -c anaconda sqlite
 
-
+import sys
 import pandas as pd
 import numpy as np
 import sqlite3
