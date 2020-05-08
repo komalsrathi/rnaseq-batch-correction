@@ -18,7 +18,7 @@ option_list <- list(
   make_option(
     opt_str = "--metadata",
     type = "character",
-    help = "File path to MAF file to be analyzed. Can be .gz compressed.",
+    help = "File path to metadata file to be analyzed. Can be .gz compressed.",
     metavar = "character"
   ),
   make_option(
@@ -37,7 +37,7 @@ option_list <- list(
   make_option(
     opt_str = "--samples",
     type = "character",
-    help = "File path to MAF file to be analyzed. Can be .gz compressed.",
+    help = "File path to sample file to be analyzed. Can be .gz compressed.",
     metavar = "character"
   ),
   make_option(
