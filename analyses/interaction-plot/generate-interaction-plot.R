@@ -140,10 +140,9 @@ maf_df <- maf_df %>%
     Consequence
   )
 
-#get ncbi file (or take as option?)
+#get ncbi file (or take as option?) for exclude genes
 #get gene list
 genes <- unique(maf_df$Hugo_Symbol)
-genes <- genes[!genes %in% exclude_df$gene] #remove genes from exclude list
 
 #organize variant types and decide which to analyze
 # generate consequence lists and filter
@@ -199,6 +198,15 @@ for (disease_id in keys(diseases)) {
   print(disease_id)
   full_disease_id <- diseases[[disease_id]]
   print(full_disease_id)
+
+  #when not analyzing a specific disease, exclude commonly mutated genes
+  if (disease_id == "all") {
+    genes <- genes[!genes %in% exclude_df$gene] #remove genes from exclude list
+  }
+  else {
+    genes <- unique(maf_df$Hugo_Symbol)
+  }
+
   #filter for samples with the disease
   disease_df <- meta_df %>%
     dplyr::filter(Kids_First_Biospecimen_ID %in% sample_df$Kids_First_Biospecimen_ID) %>%
