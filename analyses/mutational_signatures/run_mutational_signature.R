@@ -16,6 +16,8 @@ if (!("optparse" %in% installed.packages())){
 suppressPackageStartupMessages(library("tidyverse"))
 suppressPackageStartupMessages(library("deconstructSigs"))
 suppressPackageStartupMessages(library("optparse"))
+suppressPackageStartupMessages(library("reshape2"))
+library(RColorBrewer)
 
 
 option_list <- list(
@@ -42,7 +44,10 @@ option_list <- list(
               help = "Subgroup in metadata"),
   make_option(c("-s", "--signatures"),
               type = "character", default = NULL,
-              help = "deconstructSigs signatures :cosmic or nature2013")
+              help = "deconstructSigs signatures :cosmic or nature2013"),
+  make_option(c("-o", "--outputfolder"),
+              type = "character", default = NULL,
+              help = "folder name in output")
 )
 
 root_dir <- rprojroot::find_root(rprojroot::has_dir(".git"))
@@ -63,6 +68,24 @@ wgs_bed <- file.path(root_dir, opt$wgs_bed)
 # read in wes bed
 wxs_bed <- file.path(root_dir, opt$wxs_bed)
 
+# read in grouping param
+grouping_by <- opt$grouping_by
+
+# output folder name
+outputfolder <- opt$outputfolder
+# if missing create folder
+if (!file.exists(file.path(root_dir,
+                          "analyses",
+                          "mutational_signatures",
+                          "output",
+                          outputfolder))) {
+  dir.create(file.path(root_dir,
+                       "analyses",
+                       "mutational_signatures",
+                       "output",
+                       outputfolder))
+  }
+
 # read in metadata
 metadata_df <- read_tsv(
   file.path(root_dir, opt$metadata_df), guess_max = 10000) %>%
@@ -70,17 +93,14 @@ metadata_df <- read_tsv(
   dplyr::select(
     "Tumor_Sample_Barcode",
     "experimental_strategy",
-    "short_histology") %>%
+    !!(as.name(grouping_by))) %>%
   # Easier to deal with NA short histologies
   # if they are labeled something different
   dplyr::mutate(
-    short_histology = as.character(tidyr::replace_na(short_histology, "none")))
+    grouping_by = as.character(tidyr::replace_na(grouping_by, "none")))
 
 # read in signature param
 signatures <- opt$signatures
-
-# read in grouping param
-grouping_by <- opt$grouping_by
 
 # source functions to make them available in this notebook; maybe be called as functions is package is built around this
 # step1 run deconstructSigs from maf to signature matrix
@@ -98,6 +118,11 @@ source(file.path(root_dir, "analyses",
                  "mutational_signatures",
                  "code",
                  "grouped_sigs_barplot.R"))
+# step4 plot per sample X signature matrix plots
+source(file.path(root_dir, "analyses",
+                 "mutational_signatures",
+                 "code",
+                 "perSample_matrix_plot.R"))
 
 
 # Step 1. Run deconstructSigs for samples in given maf file
@@ -113,6 +138,7 @@ write_tsv(deconstructSigs_output, file.path(root_dir,
                                             "analyses",
                                             "mutational_signatures",
                                             "output",
+                                            outputfolder,
                                             paste0("deconstructSigs_",
                                                    signatures, ".tsv")))
 
@@ -126,7 +152,8 @@ gradient_col_palette <- gradient_col_palette %>%
 
 # Step 2. Bubble plot per short histology
 # plot and save
-label <- paste(signatures, "Signatures")
+label <- paste(signatures, "Signatures",sep="_")
+width_size_cm<-10*length(unique(metadata_df[,grouping_by]))
 bubble_matrix_plot(deconstructSigs_output,
                    label = label,
                    color_palette = gradient_col_palette$hex_codes,
@@ -135,8 +162,10 @@ bubble_matrix_plot(deconstructSigs_output,
   file.path(root_dir, "analyses",
             "mutational_signatures",
             "output",
+            outputfolder,
             paste0("bubble_matrix_", signatures, "_mutation_sig.png")),
-  width = 30, height = 20, units = "cm")
+  width = width_size_cm, height = 20, units = "cm")
+
 # Step 3. Barplot plot per short histology
 # Keep only primary tumors
 ind_samples <- readr::read_tsv(file.path(root_dir, opt$ind_sample))
@@ -151,6 +180,33 @@ lapply(unique(deconstructSigs_output$short_histology),
        output_dir = file.path(root_dir, "analyses",
                               "mutational_signatures",
                               "output",
+                              outputfolder,
                               "signature_grouped_barplots"),
        label = label
 )
+
+# Step 4. Sample level matrix
+width_size_cm<-40*length(unique(metadata_df[,"Tumor_Sample_Barcode"]))
+perSample_matrix_plot(deconstructSigs_output,
+                   label = label,
+                   color_palette = NA) +
+  ggsave(
+  file.path(root_dir, "analyses",
+            "mutational_signatures",
+            "output",
+            outputfolder,
+            paste0("perSample_matrix_", signatures, "_mutation_sig_sample.png")),
+  width = width_size_cm, height = 20, units = "cm")
+
+width_size_cm<-20*length(unique(metadata_df[,"Tumor_Sample_Barcode"]))
+perSample_matrix_plot(deconstructSigs_output,
+                      label = label,
+                      color_palette = NA,
+                      cluster=TRUE) +
+  ggsave(
+    file.path(root_dir, "analyses",
+              "mutational_signatures",
+              "output",
+              outputfolder, 
+              paste0("perSample_matrix_", signatures, "_mutation_sig_cluster.png")),
+    width = width_size_cm, height = 20, units = "cm")

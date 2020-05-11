@@ -98,11 +98,13 @@ run_deconstructSigs <- function( maf = maf,
     stop("Provide normalization methods")
   }
   # Pull out the signature weights and make into matrix
-  sig_num_df <- do.call(
+  sig_num_weights <- do.call(
     "rbind.data.frame",
     lapply(sample_sigs, function(sample_data) sample_data$weights)
   ) %>%
-    tibble::rownames_to_column("Tumor_Sample_Barcode") %>%
+    tibble::rownames_to_column("Tumor_Sample_Barcode")
+
+  sig_num_muts_mb <- sig_num_weights %>%
     # Calculate the number of mutations contributing to each signature
     # Here the weight is multiplied by the total number of signature mutations.
     dplyr::mutate_at(dplyr::vars(-Tumor_Sample_Barcode), ~ . * total_muts) %>%
@@ -129,5 +131,13 @@ run_deconstructSigs <- function( maf = maf,
     dplyr::rename("signature" = variable) %>%
     # Make this a factor but make sure the levels stay in order
     dplyr::mutate(signature = factor(signature, levels = unique(signature)))
+
+  sig_num_df <- reshape2::melt(sig_num_weights) %>%
+    # rename columns after melt()
+    rename(signature = "variable",
+           weights = "value") %>%
+    # add weights to dataframe
+    right_join(sig_num_muts_mb, by = c("Tumor_Sample_Barcode", "signature"))
+
   return(sig_num_df)
 }
