@@ -13,7 +13,7 @@ Usage: generate-interaction-plot.R [options]
 
 Options:
 	--metadata=CHARACTER
-		File path to MAF file to be analyzed. Can be .gz compressed.
+		File path to metadata file to be analyzed. Can be .gz compressed.
 
 	--outdir=OUTDIR
 		Output directory path.
@@ -23,7 +23,7 @@ Options:
       A tsv file which must contain a column named 'gene` that contains Hugo Symbols
 
 	--samples=CHARACTER
-		File path to MAF file to be analyzed. Can be .gz compressed.
+		File path to sample file to be analyzed. Can be .gz compressed.
 
 	--maf=CHARACTER
 		File path of MAF file to be analyzed. Can be .gz compressed.
