@@ -14,6 +14,19 @@ library(ggplot2)
 library(hash)
 library(patchwork)
 
+get_gene_list <- function(maf_df, exclude_file, disease_id) {
+  #given the maf file and disease id, return gene list
+  #only exclude commonly mutated genes when the disease group is all
+  #get ncbi file (or take as option?) for exclude genes
+  #get initial gene list
+  genes <- unique(maf_df$Hugo_Symbol)
+  if (tolower(disease_id) == "all") {
+    exclude_df <- data.table::fread(exclude_file, data.table = FALSE)
+    genes <- genes[!genes %in% exclude_df$gene] #remove genes from exclude list
+  }
+  return(genes)
+}
+
 option_list <- list(
   make_option(
     opt_str = "--metadata",
@@ -117,7 +130,6 @@ diseases <- hash(
 meta_df <- readr::read_tsv(meta_file, col_types = readr::cols(), guess_max = 10000)
 sample_df <- readr::read_tsv(sample_file, col_types = readr::cols())
 maf_df <- data.table::fread(maf_file, data.table = FALSE)
-exclude_df <- data.table::fread(exclude_file, data.table = FALSE)
 
 ### Reduce MAF to a smaller set of relevant columns
 maf_df <- maf_df %>%
@@ -139,10 +151,6 @@ maf_df <- maf_df %>%
     t_alt_count,
     Consequence
   )
-
-#get ncbi file (or take as option?) for exclude genes
-#get gene list
-genes <- unique(maf_df$Hugo_Symbol)
 
 #organize variant types and decide which to analyze
 # generate consequence lists and filter
@@ -199,13 +207,7 @@ for (disease_id in keys(diseases)) {
   full_disease_id <- diseases[[disease_id]]
   print(full_disease_id)
 
-  #when not analyzing a specific disease, exclude commonly mutated genes
-  if (disease_id == "all") {
-    genes <- genes[!genes %in% exclude_df$gene] #remove genes from exclude list
-  }
-  else {
-    genes <- unique(maf_df$Hugo_Symbol)
-  }
+  genes <- get_gene_list(maf_df, exclude_file, disease_id)
 
   #filter for samples with the disease
   disease_df <- meta_df %>%
