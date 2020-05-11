@@ -47,21 +47,6 @@ args = parser.parse_args()
 #  that intersect with both target and coding exons
 db_intersectbed_table_name=args.databasetablename+"_intersectbed"
 
-# Will be using argparse when the logic looks okay after first PR
-#maf_file = "/Users/kogantit/Documents/git_repos/d3b-bix-analysis-toolkit/analyses/TMBanalysis/inputs/temp.maf"
-#maf_file = "/Users/kogantit/Documents/TMB/pbta-snv-mutect2.vep.maf"
-#maf_file = "/Users/kogantit/Documents/TMB/PNOC008_MAFfiles/PNOC008_WXS_mergedMAF.maf"
-#db_name= "/Users/kogantit/Documents/git_repos/d3b-bix-analysis-toolkit/analyses/TMBanalysis/output/PNOC008WXS_var_db.sqlite"
-#db_name = "/Users/kogantit/Documents/git_repos/d3b-bix-analysis-toolkit/analyses/TMBanalysis/output/sample_var_db.sqlite"
-#cds_bed="/Users/kogantit/Documents/TMB/gencode.v34.annotation.exononly.bed"
-#cds_bed = "/Users/kogantit/Documents/git_repos/d3b-bix-analysis-toolkit/analyses/TMBanalysis/inputs/CCDS_gencode27.bed"
-#target_bed="/Users/kogantit/Documents/TMB/xgen-exome-research-panel-targets_hg38_ucsc_liftover.100bp_padded.sort.merged.bed"
-#db_table_name = "mutect2"
-#db_table_name = "consensus_WXS"
-#db_intersectbed_table_name = "mutect2_intersectbed"
-#db_intersectbed_table_name = "consensus_WXS_intersectbed"
-#intersected_bed_out = "/Users/kogantit/Documents/git_repos/d3b-bix-analysis-toolkit/analyses/TMBanalysis/output/xgen_intersected_cds.bed"
-
 
 # Function to establish a database connection; else return error message 
 def create_connection(db_file):
