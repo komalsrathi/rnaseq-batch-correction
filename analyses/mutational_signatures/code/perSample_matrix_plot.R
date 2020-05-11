@@ -1,4 +1,4 @@
-#' Author: C. Savonen for ALSF CCDL and Krutika Gaonkar for D3b
+#' Krutika Gaonkar for D3b
 #'
 #'
 #' Given the data.frame output from `run_deconstructSigs` that has the number of 
@@ -9,7 +9,7 @@
 #' @param color_palette a set of colors to use for a color palette.
 #' @param color_breaks a set of numeric breaks to be used for color palette, needs to be the same length as the color palette provided. 
 #' @param cluster a logical param if TRUE plots cluster according to mutations per Mb associated with each signature
-#' @return A per sample matrix plot with the number of mutations per Mb of tumors per signature weight for all samples
+#' @return A per sample matrix plot with the number of mutations per Mb of tumors per signature weight for all samples or a clustering plot if cluster==TRUE
 
 perSample_matrix_plot <- function(sig_num_df,
                                label = "none",
