@@ -1,74 +1,57 @@
-### TMB analysis 
+### TMB analysis
 
-This analysis computes tumor mutation burden for different disease types 
+This analysis computes tumor mutation burden for different disease types
 
-##### 1. Create database with variants in MAF file
-- The first step reads in MAF file in chunks, intersects variants with target region and only filters variants that show `Missense_Mutation`, `Nonsense_Mutation`, `Frame_Shift_Del`, `Frame_Shift_Ins`, `In_Frame_Del` and `In_Frame_Ins` in variant_classification
-- Writes the  MAF variants with selected columns. This helps use groupby feature based on each sample in the next step 
-   
-   `Usage`: python3 01_setup_mafdb.py [-h] -m MAFFILE -d MAFDATABASENAME -t TARGETBED -c
-                         CDSBED -b DATABASETABLENAME -i INTERSECTBEDNAME
+##### Calculate TMB scores
+  1. Reads the MAF file -
+      - Calculates VAF
+      - Filters based on variant_classification column
+      - Uses pybedtools to only filter variants within target BED
 
-      optional arguments:
-      -h, --help            show this help message and exit
-      -m MAFFILE, --maffile MAFFILE
-                        path to the MAF file with all samples
-      -d MAFDATABASENAME, --mafdatabasename MAFDATABASENAME
-                        MAF sqlite database name
-      -t TARGETBED, --targetbed TARGETBED
-                        capture target BED
-      -c CDSBED, --cdsbed CDSBED
-                        CDS BED
-      -b DATABASETABLENAME, --databasetablename DATABASETABLENAME
-                        CDS BED
-      -i INTERSECTBEDNAME, --intersectbedname INTERSECTBEDNAME
-                        Name of out BED name intersected with target and CDS
-   
-
-   `Output` : [output/var_db.sqlite](https://github.com/d3b-center/d3b-bix-analysis-toolkit/tree/TMBanalysis/analyses/TMBanalysis/output)
+  2. Calculates TMB
+      - Calculates TMB based on ((# of variants)*1000000) / size of BED
+      - Add histology type from metadata file and write to outfile
 
 
-##### 2. Calculate tumor mutation burden scores 
-- This step reads in variant database, uses `GROUP BY` to calculate  number of variants under each sample. Then calculates TMB score using the formula below. 
-      `TMB  = (Number of nonsynonymous  mutations/1000000)*Number of bases in target  BED`         
-- This also reads in a metadata file (histology for PBTA) and matches up the disease type with the sample names 
-   
-   `Usage`: python3 02_calculate_tmb_from_mafdb.py [-h] -m METADATAFILE -c DISEASECOL -d
-                                      DATABASENAME -s SAMPLECOL -b
-                                      DATABASETABLENAME -o OUTFILENAME -i
-                                      INTERSECTBEDNAME
+   `Usage`: python3 01_calculate_tmb.py [-h] -i MAF_FILE -m METADATAFILE -d DISEASE_COL -s
+                           SAMPLE_COL -t TARGET_BED -c CDS_BED -o OUTFILENAME
 
-      optional arguments:
-      -h, --help            show this help message and exit
-      -m METADATAFILE, --metadatafile METADATAFILE
-                        path to the metadata/histology
-      -c DISEASECOL, --diseasecol DISEASECOL
+          optional arguments:
+          -h, --help            show this help message and exit
+          -i MAF_FILE, --maf_file MAF_FILE
+                        path to the MAF file
+          -m METADATAFILE, --metadatafile METADATAFILE
+                        path to the metadata/histology file
+          -d DISEASE_COL, --disease_col DISEASE_COL
                         Disease column name in metadatafile
-      -d DATABASENAME, --databasename DATABASENAME
-                        Database name with variant MAF tables
-      -s SAMPLECOL, --samplecol SAMPLECOL
+          -s SAMPLE_COL, --sample_col SAMPLE_COL
                         Sample column name in metadatafile
-      -b DATABASETABLENAME, --databasetablename DATABASETABLENAME
-                        tablename within database with variants within target
-                        region
-      -o OUTFILENAME, --outfilename OUTFILENAME
+          -t TARGET_BED, --target_bed TARGET_BED
+                        target_bed
+          -c CDS_BED, --cds_bed CDS_BED
+                        cds_bed
+          -o OUTFILENAME, --outfilename OUTFILENAME
                         Out file name
-      -i INTERSECTBEDNAME, --intersectbedname INTERSECTBEDNAME
-                        Intersected BED between target and CDS
+
+   `Output` :
+
+   - [output/pbta-mutect2-tmb_withintarget.txt](https://github.com/d3b-center/d3b-bix-analysis-toolkit/tree/TMBanalysis/analyses/TMBanalysis/output)
+   - [output/pbta-mutect2-tmb_withintarget_and_cds.txt](https://github.com/d3b-center/d3b-bix-analysis-toolkit/blob/feature/tmb_code/analyses/TMBanalysis/output/pbta-mutect2-tmb_withintarget_and_cds.txt)
 
 
-   `Output` : [output/pbta-snv-mutect2-tmbscores.txt](https://github.com/d3b-center/d3b-bix-analysis-toolkit/blob/TMBanalysis/analyses/TMBanalysis/output/pbta-snv-mutect2-tmbscores.target.txt)  
+##### Plot TMB scores
 
-##### 3. Plot TMB scores 
-- This step reads in the TMB scores per sample and plots a jitter plot for every  disease type
-- Every disease type with at least 20 samples are plotted and a median line is drawn on each disease plot. Log scale is used for y-axis    
-   `Usage` : python3 03_tmbplots.py [-h] -t TMBSCOREFILE -o OUTPLOTNAME
+ 1. Takes an input file that has sample name, count, TMB and histology type
+ 2. Using seaborn module, implement `stripplot` to generate TMB plots per disease type
+ 3. Calculates the median line for each disease type
 
-      optional arguments:
-      -h, --help            show this help message and exit
-      -t TMBSCOREFILE, --tmbscorefile TMBSCOREFILE
+   `Usage` : python3 02_tmbplots.py [-h] -t TMBSCOREFILE -o OUTPLOTNAME
+
+        optional arguments:
+          -h, --help            show this help message and exit
+          -t TMBSCOREFILE, --tmbscorefile TMBSCOREFILE
                         File with TMB and short_histology columns
-      -o OUTPLOTNAME, --outplotname OUTPLOTNAME
+          -o OUTPLOTNAME, --outplotname OUTPLOTNAME
                         File where the TMB plot should be saved
 
    `Output` :
@@ -77,5 +60,3 @@ This analysis computes tumor mutation burden for different disease types
    Cumulative  distribution function of the same fig
 
    ![](output/pbta-snv-mutect2.CFD.TMB.png)
-
-

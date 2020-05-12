@@ -1,3 +1,16 @@
+#!/bin/env python
+# Author: Teja Koganti
+
+# python3 02_tmbplots.py  \ 
+#  -t ../output/pbta-snv-mutect2-tmbscores.target.txt \
+#  -o ../output/pbta-snv-mutect2.tmb
+
+# This script does the following - 
+#  1. takes an input file that has sample name, count, TMB score and histology type
+#  2. Using seaborn module, implement `stripplot` to generate TMB plots per disease type
+#  3. Calculates the median line for each disease type
+
+
 import subprocess
 import argparse
 import sys
