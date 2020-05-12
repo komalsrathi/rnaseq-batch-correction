@@ -32,13 +32,11 @@ def install_package(package, package_list):
         print("Installing package " + package)
         pip._internal.main(["install", package])
 
-
 def maf_intersectbed(mafbed_df, targetbed, cols):
     mafbed_within_target = pybedtools.BedTool.from_dataframe(mafbed_df).intersect(
         targetbed, u=True
     )
     return pybedtools.BedTool.to_dataframe(mafbed_within_target, names=cols)
-
 
 def calculate_TMB(mafbed_df, bedsize, sample_col):
     grouped_maf = mafbed_df.groupby("Tumor_Sample_Barcode")["Chromosome"].count()
@@ -47,6 +45,16 @@ def calculate_TMB(mafbed_df, bedsize, sample_col):
     grouped_maf.columns = ["Tumor_Sample_Barcode", "Count", "TMB"]
     grouped_maf = grouped_maf.rename(columns={"Tumor_Sample_Barcode": sample_col})
     return grouped_maf
+
+def calculate_bed_length(in_bed):
+        total_length = 0 
+        for line in in_bed:
+            if(line.split()[0]!="chrom"):
+                try:
+                      total_length  += int(line.split()[2]) - int(line.split()[1])
+                except IndexError:
+                      print("Check BED file formatting\n")
+        return(total_length)
 
 
 ###################################################################
@@ -93,8 +101,10 @@ parser.add_argument("-o", "--outfilename", required=True, help="Out file name")
 args = parser.parse_args()
 
 
-target_bed_size = 77462866
-intersected_target_bed_size = 76472464
+#target_bed_size = 77462866
+#intersected_target_bed_size = 76472464
+
+
 
 
 ########################################################
@@ -142,6 +152,11 @@ needed_cols = [
 ########### Preparing and filtering MAF ###################################
 print("\nPreparing MAF dataframe... \n")
 intersected_bed = pybedtools.BedTool(args.target_bed).intersect(args.cds_bed, u=True)
+
+# Getting target  BED lengths 
+target_bed_size = calculate_bed_length(open(args.target_bed, "r"))
+#calculate_bed_length(open(sys.argv[1], "r"))
+intersected_target_bed_size = calculate_bed_length(pybedtools.BedTool.to_dataframe(intersected_bed).set_index("chrom").to_string().split("\n"))
 
 # Loading MAF file
 maf_file = pd.read_table(args.maf_file, na_values=["."], comment="#", sep="\t")
