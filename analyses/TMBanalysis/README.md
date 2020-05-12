@@ -1,8 +1,8 @@
-### TMB analysis
+## TMB analysis
 
 This analysis computes tumor mutation burden for different disease types
 
-##### Calculate TMB scores
+### Calculate TMB scores
   1. Reads the MAF file -
       - Calculates VAF
       - Filters based on variant_classification column
@@ -39,7 +39,7 @@ This analysis computes tumor mutation burden for different disease types
    - [output/pbta-mutect2-tmb_withintarget_and_cds.txt](https://github.com/d3b-center/d3b-bix-analysis-toolkit/blob/feature/tmb_code/analyses/TMBanalysis/output/pbta-mutect2-tmb_withintarget_and_cds.txt)
 
 
-##### Plot TMB scores
+### Plot TMB scores
 
  1. Takes an input file that has sample name, count, TMB and histology type
  2. Using seaborn module, implement `stripplot` to generate TMB plots per disease type
