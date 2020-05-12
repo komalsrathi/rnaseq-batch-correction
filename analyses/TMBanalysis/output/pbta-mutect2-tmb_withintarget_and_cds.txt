@@ -1,4 +1,4 @@
-Kids_First_Biospecimen_ID,Count,TMB,short_histology
+Sample_name,Count,TMB,Histology_type
 BS_007JTNB8,17,0.22230223940476143,Ependymoma
 BS_00TRPEQX,71,0.9284387645728271,HGAT
 BS_01DQH017,29,0.37922146721988714,Ependymoma

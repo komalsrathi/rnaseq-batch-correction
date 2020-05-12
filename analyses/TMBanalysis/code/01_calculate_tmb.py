@@ -1,3 +1,27 @@
+#!/bin/env python
+# Author: Teja Koganti
+
+# This  script does the following -
+#  1. Reads the MAF file -
+# 	- Calculates VAF
+# 	- Filters based on variant_classification column
+# 	- Uses pybedtools to only filter variants within target BED
+#  2. Calculates TMB
+# 	- Calculates TMB based on (# of variants)*1000000 / size of BED
+# 	- Add histology type from metadata file and write to outfile
+
+# Usage:
+# python3 01_calculate_tmb.py \
+# 	-i temp.maf  \
+# 	-m pbta-histologies.tsv  \
+# 	-d "short_histology"  \
+# 	-s "Kids_First_Biospecimen_ID"  \
+# 	-t xgen-exome-research-panel-targets_hg38_ucsc_liftover.100bp_padded.sort.merged.bed  \
+# 	-c gencode.v34.annotation.exononly.bed  \
+# 	-o OUTTEST  \
+#
+
+
 import subprocess
 import argparse
 import sys
@@ -21,7 +45,6 @@ def calculate_TMB(mafbed_df, bedsize, sample_col):
     grouped_maf = grouped_maf.reset_index()
     grouped_maf["TMB"] = (grouped_maf["Chromosome"] * 1000000) / bedsize
     grouped_maf.columns = ["Tumor_Sample_Barcode", "Count", "TMB"]
-    # df.rename(columns={"A": "a"
     grouped_maf = grouped_maf.rename(columns={"Tumor_Sample_Barcode": sample_col})
     return grouped_maf
 
@@ -115,11 +138,10 @@ needed_cols = [
 ###########################################################
 
 
-########### Preparing and filtering MAF ###################
+###########################################################################
+########### Preparing and filtering MAF ###################################
+print("\nPreparing MAF dataframe... \n")
 intersected_bed = pybedtools.BedTool(args.target_bed).intersect(args.cds_bed, u=True)
-# pybedtools.BedTool.to_dataframe(intersected_bed.merge()).to_csv(
-#    intersected_bed_out, sep="\t", header=None, index=False)
-
 
 # Loading MAF file
 maf_file = pd.read_table(args.maf_file, na_values=["."], comment="#", sep="\t")
@@ -137,7 +159,10 @@ maf_filtered = maf_file.loc[
 ###########################################################################
 
 
+############################################################################
 ##################### Filtering MAF within target ###########################
+print("\n Filtering MAF dataframe... \n")
+
 maf_within_exon_and_target = maf_intersectbed(
     maf_filtered, intersected_bed, needed_cols
 )
@@ -152,7 +177,9 @@ tmb_scores_within_target = calculate_TMB(
 ##############################################################################
 
 
+################################################################################
 ################### Mapping disease col and calculate TMB #######################
+print("\n mapping disease names with metadata file... \n")
 
 metadata = pd.read_csv(
     args.metadatafile,
@@ -182,8 +209,13 @@ final_tmb_target_and_cds = tmb_scores_within_exon_and_target.set_index(
 target_out = args.outfilename + "_withintarget.txt"
 target_and_cds_out = args.outfilename + "_withintarget_and_cds.txt"
 
-
-final_tmb_target.reset_index().to_csv(target_out, index=False)
-final_tmb_target_and_cds.reset_index().to_csv(target_and_cds_out, index=False)
+# Renaming sample column and disease type column and
+# writing to output file
+final_tmb_target.reset_index().rename(
+    columns={args.sample_col: "Sample_name", args.disease_col: "Histology_type"}
+).to_csv(target_out, index=False)
+final_tmb_target_and_cds.reset_index().rename(
+    columns={args.sample_col: "Sample_name", args.disease_col: "Histology_type"}
+).to_csv(target_and_cds_out, index=False)
 
 ##################################################################################
