@@ -1,0 +1,2 @@
+WGS	/Users/kogantit/Documents/git_repos/d3b-bix-analysis-toolkit/analyses/TMBanalysis/inputs/wgs_canonical_calling_regions.hg38.bed
+WXS	/Users/kogantit/Documents/git_repos/d3b-bix-analysis-toolkit/analyses/TMBanalysis/inputs/Strexome_targets_intersect_sorted_padded100.GRCh38.bed
