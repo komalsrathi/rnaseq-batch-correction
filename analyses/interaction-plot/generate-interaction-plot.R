@@ -80,9 +80,7 @@ print(meta_file)
 print(out_dir)
 print(script_dir)
 
-#load additional functions
-#we might only need the one file, so it might be better to take
-#the path to that script not the folder
+#load additional / helper functions
 source(file.path(script_dir, "cooccur_functions.R"))
 source(file.path(script_dir, "process_inputs.R"))
 
@@ -140,55 +138,6 @@ maf_df <- maf_df %>%
     Consequence
   )
 
-#organize variant types and decide which to analyze
-# generate consequence lists and filter
-intergenic <- c("IGR")
-nontranscribed <- c(
-  "3'Flank",
-  "5'Flank",
-  "Targeted_Region"
-)
-noncoding <- c(
-  "RNA",
-  "Intron",
-  "3'UTR",
-  "5'UTR",
-  "Splice_Region",
-  "lincRNA"
-)
-# Variant Classification with Low/Modifier variant consequences
-#  from maftools http://asia.ensembl.org/Help/Glossary?id=535
-synonymous <- c(
-  "Silent",
-  "Start_Codon_Ins",
-  "Start_Codon_SNP",
-  "Stop_Codon_Del",
-  "De_novo_Start_InFrame",
-  "De_novo_Start_OutOfFrame"
-)
-# Variant Classification with High/Moderate variant consequences from maftools
-nonsynonymous <- c(
-  "Missense_Mutation",
-  "Frame_Shift_Del",
-  "In_Frame_Ins",
-  "Frame_Shift_Ins",
-  "Splice_Site",
-  "Nonsense_Mutation",
-  "In_Frame_Del",
-  "Nonstop_Mutation",
-  "Translation_Start_Site"
-)
-include <- nonsynonymous # always want nonsyn
-#if (opts$include_syn) {
-#  include <- c(include, synonymous)
-#}
-#if (opts$include_noncoding) {
-#  include <- c(include, noncoding)
-#}
-#if (opts$include_nontranscribed) {
-#  include <- c(include, nontranscribed)
-#}
-
 #run analysis for each disease
 for (disease_id in keys(diseases)) {
   print(disease_id)
@@ -214,12 +163,7 @@ for (disease_id in keys(diseases)) {
   dplyr::filter(Tumor_Sample_Barcode %in% samples) %>%
   dplyr::mutate(vaf = t_alt_count / (t_ref_count + t_alt_count))
   #filter maf file
-  maf_filtered <- sample_maf %>%
-  filter_mutations(
-    min_vaf = min_vaf,
-    min_depth = min_depth,
-    include_var_class = include
-  )
+  maf_filtered <- sample_maf
 
   # count mutations by gene/sample pair
   gene_sample_counts <- maf_filtered %>%
