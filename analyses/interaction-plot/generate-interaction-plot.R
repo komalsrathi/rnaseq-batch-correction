@@ -14,19 +14,6 @@ library(ggplot2)
 library(hash)
 library(patchwork)
 
-get_gene_list <- function(maf_df, exclude_file, disease_id) {
-  #given the maf file and disease id, return gene list
-  #only exclude commonly mutated genes when the disease group is all
-  #get ncbi file (or take as option?) for exclude genes
-  #get initial gene list
-  genes <- unique(maf_df$Hugo_Symbol)
-  if (tolower(disease_id) == "all") {
-    exclude_df <- data.table::fread(exclude_file, data.table = FALSE)
-    genes <- genes[!genes %in% exclude_df$gene] #remove genes from exclude list
-  }
-  return(genes)
-}
-
 option_list <- list(
   make_option(
     opt_str = "--metadata",
@@ -97,6 +84,7 @@ print(script_dir)
 #we might only need the one file, so it might be better to take
 #the path to that script not the folder
 source(file.path(script_dir, "cooccur_functions.R"))
+source(file.path(script_dir, "process_inputs.R"))
 
 #set up color palette
 divergent_palette <- readr::read_tsv(pallette_file, col_types = readr::cols())
