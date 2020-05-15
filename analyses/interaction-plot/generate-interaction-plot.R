@@ -149,8 +149,8 @@ for (disease_id in keys(diseases)) {
   #filter for samples with the disease
   disease_df <- meta_df %>%
     dplyr::filter(Kids_First_Biospecimen_ID %in% sample_df$Kids_First_Biospecimen_ID) %>%
-    dplyr::filter(tolower(full_disease_id) == "all" |
-      tolower(integrated_diagnosis) == tolower(full_disease_id)) %>%
+    dplyr::filter(tolower(disease_id) == "all" |
+      tolower(short_histology) == tolower(disease_id)) %>%
     dplyr::select(Kids_First_Participant_ID, Kids_First_Biospecimen_ID)
 
   #filter metadata to chosen samples
@@ -197,7 +197,7 @@ for (disease_id in keys(diseases)) {
   dplyr::filter(gene %in% top_count_genes) %>%
   dplyr::left_join(sample_meta,
     by = c("sample" = "Kids_First_Biospecimen_ID")) %>%
-  dplyr::group_by(gene, disease = integrated_diagnosis) %>%
+  dplyr::group_by(gene, disease = short_histology) %>%
   dplyr::summarize(mutant_samples = dplyr::n(),
     total_muts = sum(mutations),
     mean_muts_per_sample = mean(mutations)) %>%
