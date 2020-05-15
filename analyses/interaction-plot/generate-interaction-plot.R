@@ -2,7 +2,6 @@
 
 #TODO / Questions:
 # Add CNV options and parsing?
-# Flags for different mutation types (syn, non-coding)
 
 #Magrittr pipe
 #symbol set to basically work like unix pipe
@@ -62,9 +61,7 @@ option_list <- list(
 
 #defaults that might be changed later
 max_genes <- 50
-min_vaf <- 0.05 #minimum vaf for inclusion
 min_mutated <- 5 #Number of samples that have to have mutation for it to be included
-min_depth <- 0 #minimum depth of coverage
 plot_size <- 50
 
 #parse options
@@ -75,7 +72,7 @@ maf_file <- file.path(opts$maf)
 out_dir <- file.path(opts$outdir)
 exclude_file <- file.path(opts$exclude)
 script_dir <- file.path(opts$scripts)
-pallette_file <- file.path(opts$palette)
+palette_file <- file.path(opts$palette)
 print(meta_file)
 print(out_dir)
 print(script_dir)
@@ -85,13 +82,9 @@ source(file.path(script_dir, "cooccur_functions.R"))
 source(file.path(script_dir, "process_inputs.R"))
 
 #set up color palette
-divergent_palette <- readr::read_tsv(pallette_file, col_types = readr::cols())
-divergent_colors <- divergent_palette %>%
-  dplyr::filter(color_names != "na_color") %>%
-  dplyr::pull(hex_codes)
-na_color <- divergent_palette %>%
-  dplyr::filter(color_names == "na_color") %>%
-  dplyr::pull(hex_codes)
+colors <- set_colors(palette_file)
+divergent_colors <- colors$divergent_colors
+na_color <- colors$na_color
 
 #create output directories
 figure_dir <- file.path(out_dir, "figures")
