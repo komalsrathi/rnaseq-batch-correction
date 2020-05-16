@@ -80,6 +80,7 @@ print(script_dir)
 #load additional / helper functions
 source(file.path(script_dir, "cooccur_functions.R"))
 source(file.path(script_dir, "process_inputs.R"))
+source(file.path(script_dir, "process_inputs.R"))
 
 #set up color palette
 colors <- set_colors(palette_file)
@@ -109,27 +110,7 @@ diseases <- hash(
 meta_df <- readr::read_tsv(meta_file, col_types = readr::cols(), guess_max = 10000)
 sample_df <- readr::read_tsv(sample_file, col_types = readr::cols())
 maf_df <- data.table::fread(maf_file, data.table = FALSE)
-
-### Reduce MAF to a smaller set of relevant columns
-maf_df <- maf_df %>%
-  dplyr::select(
-    Hugo_Symbol,
-    Entrez_Gene_Id,
-    Chromosome,
-    Start_Position,
-    End_Position,
-    Strand,
-    Variant_Classification,
-    Variant_Type,
-    Reference_Allele,
-    Tumor_Seq_Allele1,
-    Tumor_Seq_Allele2,
-    Tumor_Sample_Barcode,
-    t_depth,
-    t_ref_count,
-    t_alt_count,
-    Consequence
-  )
+maf_df <- reduce_maf(maf_df)
 
 #run analysis for each disease
 for (disease_id in keys(diseases)) {
