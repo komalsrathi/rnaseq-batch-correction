@@ -81,6 +81,7 @@ print(script_dir)
 source(file.path(script_dir, "cooccur_functions.R"))
 source(file.path(script_dir, "process_inputs.R"))
 source(file.path(script_dir, "process_inputs.R"))
+source(file.path(script_dir, "calculate_score.R"))
 
 #set up color palette
 colors <- set_colors(palette_file)
@@ -115,29 +116,20 @@ maf_df <- reduce_maf(maf_df)
 #run analysis for each disease
 for (disease_id in keys(diseases)) {
   print(disease_id)
-  full_disease_id <- diseases[[disease_id]]
-  print(full_disease_id)
 
+  #get the gene list
   genes <- get_gene_list(maf_df, exclude_file, disease_id)
 
-  #filter for samples with the disease
-  disease_df <- meta_df %>%
-    dplyr::filter(Kids_First_Biospecimen_ID %in% sample_df$Kids_First_Biospecimen_ID) %>%
-    dplyr::filter(tolower(disease_id) == "all" |
-      tolower(short_histology) == tolower(disease_id)) %>%
-    dplyr::select(Kids_First_Participant_ID, Kids_First_Biospecimen_ID)
+  #get samples with the disease
+  samples <- samples_with_disease(meta_df, sample_df disease_id)
 
-  #filter metadata to chosen samples
-  samples <- disease_df$Kids_First_Biospecimen_ID
+  #reduce meta_df to only the needed samples
   sample_meta <- meta_df %>%
   dplyr::filter(Kids_First_Biospecimen_ID %in% samples)
 
-  #reduce maf to chosen samples & calculate VAF
-  sample_maf <- maf_df %>%
-  dplyr::filter(Tumor_Sample_Barcode %in% samples) %>%
-  dplyr::mutate(vaf = t_alt_count / (t_ref_count + t_alt_count))
-  #filter maf file
-  maf_filtered <- sample_maf
+  #filter maf to chosen samples
+  maf_filtered <- maf_df %>%
+  dplyr::filter(Tumor_Sample_Barcode %in% samples)
 
   # count mutations by gene/sample pair
   gene_sample_counts <- maf_filtered %>%
@@ -365,8 +357,6 @@ for (disease_id in keys(diseases)) {
   ggsave(combined_plot, filename = combined_fig, width = 8, height = 14)
 
   #write outputs
-  disease_file <- file.path(file_dir, paste(disease_id, ".tsv", sep = ""))
-  readr::write_tsv(disease_df, disease_file)
   cooc_file <- file.path(file_dir, paste("cooccur.", disease_id, ".tsv", sep = ""))
   readr::write_tsv(cooccur_summary, cooc_file)
   gene_disease_file <- file.path(file_dir, paste("gene_disease.", disease_id, ".tsv", sep = ""))

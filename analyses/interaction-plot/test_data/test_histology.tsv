@@ -1,0 +1,16 @@
+Kids_First_Biospecimen_ID	sample_id	aliquot_id	Kids_First_Participant_ID	parent_aliquot_id	cohort	race	ethnicity	sample_type	composition	tumor_descriptor	primary_site	age_at_diagnosis_days	experimental_strategy	short_histology
+BS_XPZAD9PP	A17096-T.WXS	A17098	PT_A06JR0E5	A17096	PNOC003	Black/African American	Non-hispanic	Tumor	Solid Tissue	Diagnosis	Pons/Brainstem	2205	WXS	HGAT
+BS_B19AWBBW	7316-5000-T-A15726.WGS	729870	PT_C9YDTZPA	A15726	PNOC003	White	Non-hispanic	Tumor	Solid Tissue	Diagnosis	Pons/Brainstem	1978	WGS	HGAT
+BS_0AK4F99X	7316-4994-T-A14565.WGS	729861	PT_C5FKRB1P	A14565	PNOC003	White	Unknown	Tumor	Solid Tissue	Diagnosis	Pons/Brainstem	4529	WGS	HGAT
+BS_AHAXPFG3	7316-3228-T-A14448.WGS	556465	PT_NK8A49X5	A14448	PNOC003	Unknown	Hispanic or Latino	Tumor	Solid Tissue	Progressive	Pons/Brainstem	4896	WGS	HGAT
+BS_J8EH1N7V	7316-3229-T-SF5608-2.WGS	556467	PT_MNSEJCDM	SF5608-2	PNOC003	Unknown	Hispanic or Latino	Tumor	Solid Tissue	Diagnosis	Pons/Brainstem	2190	WGS	HGAT
+BS_0BXY0F9N	7316-1078	588352	PT_164RNWTT	NA	CBTTC	Reported Unknown	Unavailable/Not Reported	Tumor	Solid Tissue	Initial CNS Tumor	Cerebellum/Posterior Fossa	2549	RNA-Seq	Ependymoma
+BS_D3YBV7KB	7316-1943	588304	PT_NPPBNRVV	NA	CBTTC	Reported Unknown	Unavailable/Not Reported	Tumor	Solid Tissue	Unavailable	Spinal Cord- Lumbar/Thecal Sac	3918	RNA-Seq	LGAT
+BS_J9M42E4M	7316-4999-N-A15479.WGS	804018	PT_814K3T0D	A15479	PNOC003	Unknown	Hispanic or Latino	Normal	Peripheral Whole Blood	NA	Peripheral Whole Blood	2920	WGS	NA-normal
+BS_T3VJQSYM	7316-398	550024	PT_DEDRCQWH	7316-398-N-290415.WGS	CBTTC	Black or African American	Not Hispanic or Latino	Normal	Peripheral Whole Blood	NA	Peripheral Whole Blood	516	WGS	NA
+BS_2AR3AP0N	7316-1854	728253	PT_AWBPNFM5	NA	CBTTC	White	Not Hispanic or Latino	Tumor	Solid Tissue	Initial CNS Tumor	Frontal Lobe	5012	RNA-Seq	Ganglioglioma
+BS_D5NQV7N5	7316-205	570124	PT_VT6PJVQN	NA	CBTTC	White	Not Hispanic or Latino	Tumor	Solid Tissue	Initial CNS Tumor	Suprasellar/Hypothalamic/Pituitary	2759	RNA-Seq	Craniopharyngioma
+BS_C75Y7S77	7316-1675	711290	PT_CBAYDRF9	7316-1675-N-361278.WGS	CBTTC	Reported Unknown	Unavailable/Not Reported	Normal	Peripheral Whole Blood	NA	Peripheral Whole Blood	4802	WGS	NA
+BS_23M72ABG	7316-523	588343	PT_AQWDQW27	NA	CBTTC	Reported Unknown	Hispanic or Latino	Tumor	Solid Tissue	Initial CNS Tumor	Temporal Lobe	209	RNA-Seq	Meningioma
+BS_9R82A3VT	7316-4	739817	PT_YT70KJ5P	NA	CBTTC	White	Unavailable/Not Reported	Tumor	Solid Tissue	Initial CNS Tumor	Cerebellum/Posterior Fossa	315	WGS	Other
+BS_Y7F9E2E9	7316-2723	601605	PT_ZZTQQVCT	NA	CBTTC	Asian	Not Hispanic or Latino	Tumor	Solid Tissue	Initial CNS Tumor	Cerebellum/Posterior Fossa	4326	RNA-Seq	LGAT
