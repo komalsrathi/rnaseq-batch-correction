@@ -137,23 +137,12 @@ for (disease_id in keys(diseases)) {
   #get most often mutated genes
   top_count_genes <- get_top_genes(gene_sample_counts, max_genes, min_mutated)
 
+  #count mutated samples by disease type
+  gene_disease_counts <- count_diseases(gene_sample_counts, top_count_genes,
+    sample_meta)
+
   #calculate coocurrence
   cooccur_summary <- coocurrence(gene_sample_counts, top_count_genes)
-
-  #count mutated samples by disease type
-  gene_disease_counts <- gene_sample_counts %>%
-  dplyr::filter(gene %in% top_count_genes) %>%
-  dplyr::left_join(sample_meta,
-    by = c("sample" = "Kids_First_Biospecimen_ID")) %>%
-  dplyr::group_by(gene, disease = short_histology) %>%
-  dplyr::summarize(mutant_samples = dplyr::n(),
-    total_muts = sum(mutations),
-    mean_muts_per_sample = mean(mutations)) %>%
-  dplyr::ungroup() %>%
-  dplyr::arrange(
-    desc(mutant_samples),
-    desc(mean_muts_per_sample)
-  )
 
   #reduce cooccur summary to needed fields
   cooccur_df <- cooccur_summary %>%
