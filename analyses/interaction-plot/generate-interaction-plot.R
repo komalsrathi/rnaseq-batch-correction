@@ -132,30 +132,12 @@ for (disease_id in keys(diseases)) {
   dplyr::filter(Tumor_Sample_Barcode %in% samples)
 
   # count mutations by gene/sample pair
-  gene_sample_counts <- maf_filtered %>%
-  dplyr::filter(Entrez_Gene_Id > 0, # remove unknowns
-    Hugo_Symbol %in% genes) %>% # include only desired genes
-  dplyr::group_by(gene = Hugo_Symbol, sample = Tumor_Sample_Barcode) %>%
-  dplyr::tally(name = "mutations") %>%
-  dplyr::ungroup()
-  # count # of samples mutated by gene
-  gene_counts <- gene_sample_counts %>%
-  dplyr::group_by(gene) %>%
-  dplyr::summarize(
-    mutant_samples = dplyr::n(),
-    total_muts = sum(mutations),
-    mean_muts_per_sample = mean(mutations)
-    ) %>%
-  dplyr::ungroup() %>%
-  dplyr::arrange(
-    desc(mutant_samples),
-    desc(mean_muts_per_sample)
-    ) %>%
-  dplyr::filter(mutant_samples >= min_mutated |
-  dplyr::row_number() <= 2) # keep at least 2 genes
+  gene_sample_counts <- gene_counts(maf_df, genes)
 
   #get most often mutated genes
-  top_count_genes <- head(gene_counts, max_genes)$gene
+  top_count_genes <- get_top_genes(gene_sample_counts, max_genes, min_mutated)
+
+  #calculate coocurrence
   cooccur_summary <- coocurrence(gene_sample_counts, top_count_genes)
 
   #count mutated samples by disease type
