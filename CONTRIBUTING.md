@@ -21,6 +21,12 @@ Please note we have a code of conduct, please follow it in all your interactions
 - Requester should merge their own Pull Request once it gets sign-off unless they don't have permission to do so
 
 
+## Code Review Rule
+1. Each PR review must have at least 2 same-team developer approvals. Manager approval does not count.
+2. Each PR must have a good description. From reading the description, the reviewer should be able to understand what the code is meant to do. This has to be true even if there is a ticket or a requirements page.
+3. PR must have sufficient unit test and integration test coverage.
+4. If the PR is a bug fix, it must contain a test such that, should the bug fix be reverted, this test would fail.
+
 ## Code Style
 
 ### Python
