@@ -142,3 +142,32 @@ coocurrence <- function(gene_sample_df,
 
   return(gene_pair_summary)
 }
+
+modify_cooc_sum <- function(cooccur_summary) {
+  #reduce cooccur_summary to necessary fields and generate labels
+  cooccur_df <- cooccur_summary %>%
+    dplyr::mutate(
+    mut1 = mut11 + mut10,
+    mut2 = mut11 + mut01,
+    label1 = paste0(gene1, " (", mut1, ")"),
+    label2 = paste0(gene2, " (", mut2, ")")
+  )
+
+  labels <- unique(c(cooccur_df$label1, cooccur_df$label2))
+
+  #check the order of the labels to be decreasing by mut count
+  label_counts <- as.numeric(stringr::str_extract(labels, "\\b\\d+\\b"))
+  labels <- labels[order(label_counts, decreasing = TRUE)]
+  #order genes the same way, in case we want to use those
+  genes <- stringr::str_extract(labels, "^.+?\\b")
+  genes <- genes[order(label_counts, decreasing = TRUE)]
+
+  cooccur_df <- cooccur_df %>%
+    dplyr::mutate(
+    gene1 = factor(gene1, levels = genes),
+    gene2 = factor(gene2, levels = genes),
+    label1 = factor(label1, levels = labels),
+    label2 = factor(label2, levels = labels)
+  )
+  return(cooccur_df)
+}
