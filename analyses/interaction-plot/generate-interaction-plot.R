@@ -150,103 +150,19 @@ for (disease_id in keys(diseases)) {
   #make cooccur_plot
   plot_file <- file.path(figure_dir, paste("cooccur.", disease_id, ".png",
     sep = ""))
-  plot_cooccurence(cooccur_df, plot_file, plot_size)
+  cooc_plot <- plot_cooccurence(cooccur_df, plot_file, plot_size,
+    divergent_colors, na_color)
 
-  #Make gene by disease chart.
-  #this part needs to be adapted and changed.
-  #the original code is calling the gene_disease_counts disease_df
-  #this new code is using a different disease_df
-  #disease_df_save <- disease_df #save full disease_df for printing later.
-  disease_gene_df <- gene_disease_counts %>%
-    dplyr::mutate(gene = factor(gene, levels = genes))
-  display_diseases <- disease_gene_df %>%
-    dplyr::group_by(disease) %>%
-    dplyr::tally(wt = mutant_samples) %>%
-    dplyr::arrange(desc(n)) %>%
-    head(7) %>% # seven so we end up with 8 total for color reasons
-    dplyr::pull(disease)
-  disease_gene_df <- disease_gene_df %>%
-    dplyr::mutate(disease_factor =
-      forcats::fct_other(disease, keep = display_diseases) %>%
-      forcats::fct_relevel(display_diseases)
-    )
-  xscale2 <- levels(disease_gene_df$gene) %>%
-      c(rep("", plot_size - length(.)))
-  disease_plot <- ggplot(
-    disease_gene_df,
-    aes(x = gene, y = mutant_samples, fill = disease_factor)) +
-    geom_col(width = 0.7) +
-    labs(
-      x = "",
-      y = "Samples with mutations",
-      fill = "Diagnosis"
-      ) +
-    colorblindr::scale_fill_OkabeIto() +
-    scale_x_discrete(
-      limits = xscale2,
-      breaks = disease_gene_df$gene
-    ) +
-    scale_y_continuous(expand = c(0, 0.5, 0.1, 0)) +
-    theme_classic() +
-    theme(
-      axis.text.x = element_text(
-        angle = 90,
-        hjust = 1,
-        vjust = 0.5
-      ),
-      legend.position = c(1, 1),
-      legend.justification = c(1, 1),
-      legend.key.size = unit(1, "char"))
-  #save disease plot
-  disease_fig <- file.path(figure_dir, paste("gene_disease.", disease_id, ".png", sep = ""))
-  print(disease_fig)
-  ggsave(disease_plot, filename = disease_fig)
+  #make disease gene plot
+  disease_fig <- file.path(figure_dir, paste("gene_disease.", disease_id,
+    ".png", sep = ""))
+  disease_plot <- plot_disease(gene_disease_counts, disease_fig, plot_size,
+    divergent_colors, na_color, genes)
 
   #Make combined plot.
-  #labels for y axis will be gene names, with extra spaces (at bottom) blank
-  ylabels  <- cooccur_df$gene2 %>%
-    as.character() %>%
-    unique() %>%
-    c(rep("", plot_size - length(.)), .)
-  cooccur_plot2 <- cooccur_plot +
-    scale_x_discrete(
-      limits = xscale,
-      breaks = c()
-    ) +
-    scale_y_discrete(
-      limits = yscale,
-      labels = ylabels
-    ) +
-    theme(
-      plot.margin = unit(c(-3.5, 0, 0, 0), "char")# negative top margin to move plots together
-    )
-  #Move labels and themes for disease plot
-  disease_plot2 <- disease_plot +
-    theme(
-      axis.text.x = element_text(
-        angle = -90,
-        hjust = 1,
-        vjust = 0.5
-      ),
-      axis.title.y = element_text(
-        vjust = -10# keep the label close when combined
-      )
-    )
-
-  #Combine plots with <patchwork>
-  #Layout of the two plots will be one over the other (1 column),
-  #with the upper plot 3/4 the height of the lower plot
-  combined_plot <- disease_plot2 + cooccur_plot2 +
-    plot_layout(ncol = 1, heights = c(3, 4)) +
-    plot_annotation(tag_levels = "A") &
-    theme(#add uniform labels
-      axis.text.x = element_text(size = 9),
-      axis.text.y = element_text(size = 9)
-    )
-  #save combined plot.
-  combined_fig <- file.path(figure_dir, paste("combined.", disease_id, ".png", sep = ""))
-  print(combined_fig)
-  ggsave(combined_plot, filename = combined_fig, width = 8, height = 14)
+  combined_fig <- file.path(figure_dir, paste("combined.", disease_id, ".png",
+    sep = ""))
+  combine_plots(cooccur_plot, disease_plot, combined_fig)
 
   #write outputs
   cooc_file <- file.path(file_dir, paste("cooccur.", disease_id, ".tsv", sep = ""))
