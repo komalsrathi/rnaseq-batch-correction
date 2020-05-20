@@ -122,7 +122,7 @@ for (disease_id in keys(diseases)) {
   genes <- get_gene_list(maf_df, exclude_file, disease_id)
 
   #get samples with the disease
-  samples <- samples_with_disease(meta_df, sample_df disease_id)
+  samples <- samples_with_disease(meta_df, sample_df, disease_id)
 
   #reduce meta_df to only the needed samples
   sample_meta <- meta_df %>%
@@ -151,7 +151,7 @@ for (disease_id in keys(diseases)) {
   #make cooccur_plot
   plot_file <- file.path(figure_dir, paste("cooccur.", disease_id, ".png",
     sep = ""))
-  cooc_plot <- plot_cooccurence(cooccur_df, plot_file, plot_size,
+  cooc_plot <- plot_cooccurence(coocur_df, plot_file, plot_size,
     divergent_colors, na_color)
 
   #make disease gene plot
