@@ -51,13 +51,11 @@ perSample_matrix_plot <- function(sig_num_df,
       ggplot2::ggtitle(label)
 
     } else{
-    sig_num_mat <- reshape2::dcast(
+     sig_num_mat <- reshape2::dcast(
       sig_num_df,
       Tumor_Sample_Barcode ~ signature,
       value.var = "med_num")
     rownames(sig_num_mat) <- sig_num_mat$Tumor_Sample_Barcode
-    hc <- hclust(dist(sig_num_mat), "average")
-    ggdendro::ggdendrogram(hc, rotate = FALSE, size = 2)
-
+    heatmap.2(as.matrix(sig_num_mat[,-which(colnames(sig_num_mat)=="Tumor_Sample_Barcode")]),Colv = NA,dendrogram = "row",trace = "none",col=color_palette,margins=c(12,8))
     }
 }

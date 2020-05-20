@@ -18,7 +18,7 @@ suppressPackageStartupMessages(library("deconstructSigs"))
 suppressPackageStartupMessages(library("optparse"))
 suppressPackageStartupMessages(library("reshape2"))
 library(RColorBrewer)
-
+library(gplots)
 
 option_list <- list(
   make_option(c("-i", "--maf"),
@@ -199,14 +199,16 @@ perSample_matrix_plot(deconstructSigs_output,
   width = width_size_cm, height = 20, units = "cm")
 
 width_size_cm<-20*length(unique(metadata_df[,"Tumor_Sample_Barcode"]))
-perSample_matrix_plot(deconstructSigs_output,
-                      label = label,
-                      color_palette = NA,
-                      cluster=TRUE) +
-  ggsave(
-    file.path(root_dir, "analyses",
+
+png(filename = file.path(root_dir, "analyses",
               "mutational_signatures",
               "output",
-              outputfolder, 
-              paste0("perSample_matrix_", signatures, "_mutation_sig_cluster.png")),
-    width = width_size_cm, height = 20, units = "cm")
+              outputfolder,
+              paste0("perSample_matrix_",
+                     signatures,
+                     "_mutation_sig_cluster.png")),
+    width = width_size_cm, height = 20, units = "cm", res = 200)
+perSample_matrix_plot(deconstructSigs_output,
+                      label = label,
+                      cluster = TRUE)
+dev.off()
