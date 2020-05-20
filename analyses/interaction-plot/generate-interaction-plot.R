@@ -158,7 +158,7 @@ for (disease_id in keys(diseases)) {
   disease_fig <- file.path(figure_dir, paste("gene_disease.", disease_id,
     ".png", sep = ""))
   disease_plot <- plot_disease(gene_disease_counts, disease_fig, plot_size,
-    divergent_colors, na_color, genes)
+    divergent_colors, na_color)
 
   #Make combined plot.
   combined_fig <- file.path(figure_dir, paste("combined.", disease_id, ".png",

@@ -69,14 +69,10 @@ plot_cooccurence <- function(cooccur_df, plot_file, plot_size, divergent_colors,
 }
 
 plot_disease <- function (gene_disease_counts, disease_fig, plot_size,
-  divergent_colors, na_color, genes) {
+  divergent_colors, na_color) {
   #Make gene by disease chart.
-  #this part needs to be adapted and changed.
-  #the original code is calling the gene_disease_counts disease_df
-  #this new code is using a different disease_df
-  #disease_df_save <- disease_df #save full disease_df for printing later.
   disease_gene_df <- gene_disease_counts %>%
-    dplyr::mutate(gene = factor(gene, levels = genes))
+    dplyr::mutate(gene = factor(gene, levels = gene))
     display_diseases <- disease_gene_df %>%
     dplyr::group_by(disease) %>%
     dplyr::tally(wt = mutant_samples) %>%
