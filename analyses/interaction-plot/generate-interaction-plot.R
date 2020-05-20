@@ -109,7 +109,8 @@ diseases <- hash(
 )
 
 #read inputs
-meta_df <- readr::read_tsv(meta_file, col_types = readr::cols(), guess_max = 10000)
+meta_df <- readr::read_tsv(meta_file, col_types = readr::cols(),
+  guess_max = 10000)
 sample_df <- readr::read_tsv(sample_file, col_types = readr::cols())
 maf_df <- data.table::fread(maf_file, data.table = FALSE)
 maf_df <- reduce_maf(maf_df)
@@ -166,9 +167,11 @@ for (disease_id in keys(diseases)) {
   combine_plots(cooc_plot, disease_plot, combined_fig, coocur_df)
 
   #write outputs
-  cooc_file <- file.path(file_dir, paste("cooccur.", disease_id, ".tsv", sep = ""))
+  cooc_file <- file.path(file_dir, paste("cooccur.", disease_id, ".tsv",
+    sep = ""))
   readr::write_tsv(cooccur_summary, cooc_file)
-  gene_disease_file <- file.path(file_dir, paste("gene_disease.", disease_id, ".tsv", sep = ""))
+  gene_disease_file <- file.path(file_dir, paste("gene_disease.", disease_id,
+    ".tsv", sep = ""))
   readr::write_tsv(gene_disease_counts, gene_disease_file)
   }
 
