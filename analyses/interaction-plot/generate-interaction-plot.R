@@ -80,8 +80,9 @@ print(script_dir)
 #load additional / helper functions
 source(file.path(script_dir, "cooccur_functions.R"))
 source(file.path(script_dir, "process_inputs.R"))
-source(file.path(script_dir, "process_inputs.R"))
+source(file.path(script_dir, "reduce-maf.R"))
 source(file.path(script_dir, "calculate_score.R"))
+source(file.path(script_dir, "make_plots.R"))
 
 #set up color palette
 colors <- set_colors(palette_file)
