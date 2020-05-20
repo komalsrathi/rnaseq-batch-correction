@@ -121,7 +121,7 @@ plot_disease <- function (gene_disease_counts, disease_fig, plot_size,
   return(disease_plot)
 }
 
-combine_plots <- fucnction () {
+combine_plots <- function (cooccur_plot, disease_plot, combined_fig) {
   #combine cooccur and disease gene plots.
   #NOT a generic function to combine any plots.
   #labels for y axis will be gene names, with extra spaces (at bottom) blank
