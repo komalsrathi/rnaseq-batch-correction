@@ -39,6 +39,15 @@ Options:
 ```
 
 #### Inputs
+* A maf file
+* A tab separated file that will be the metadata file containing at least the following fields:
+	* Kids_First_Biospecimen_ID
+	* Kids_First_Participant_ID
+	* short_histology
+* A tab separated file with fields "Kids_First_Biospecimen_ID" and	"Kids_First_Participant_I"
+	* this will be the sample file
+* A file specifying the color palette to be used when generating the plots.
+* The path to a directory to write the output to.
 
 ##### Disease List
 
@@ -54,8 +63,7 @@ The script will analyze all samples together into one co-occurrence plot, and it
 
 #### Outputs
 
-The script outputs a series of plots and files used to generate the plots for each disease type above and for all diseases present in the metadata file. The output directory will have two sub-directories: "figures" which will contain the plots that are generated and "files" which will contain the intermediate files used to generate the plots. Each type will have the following files and plots:
-* Disease file: tab separated values file with sample ids of samples with the disease
+The script outputs a series of plots and files used to generate the plots for each disease type above and for all diseases present in the metadata file. The output directory will have two sub-directories: "figures" which will contain the plots that are generated and "files" which will contain the intermediate files used to generate the plots. Each disease type will have the following files and plots:
 * Gene Disease file: tab separated values file with a list of genes and count of samples with mutations in each gene.
 * Co-occurrence file: tab separated values file with a list of gene pairs and the co-occurrence score of each pair.
 * Co-occurrence plot: plot showing the pairwise co-occurrence of every mutated gene
