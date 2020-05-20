@@ -163,7 +163,7 @@ for (disease_id in keys(diseases)) {
   #Make combined plot.
   combined_fig <- file.path(figure_dir, paste("combined.", disease_id, ".png",
     sep = ""))
-  combine_plots(cooccur_plot, disease_plot, combined_fig)
+  combine_plots(cooc_plot, disease_plot, combined_fig, coocur_df)
 
   #write outputs
   cooc_file <- file.path(file_dir, paste("cooccur.", disease_id, ".tsv", sep = ""))

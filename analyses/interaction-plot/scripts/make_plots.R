@@ -117,9 +117,19 @@ plot_disease <- function (gene_disease_counts, disease_fig, plot_size,
   return(disease_plot)
 }
 
-combine_plots <- function (cooccur_plot, disease_plot, combined_fig) {
+combine_plots <- function (cooccur_plot, disease_plot, combined_fig, cooccur_df) {
   #combine cooccur and disease gene plots.
   #NOT a generic function to combine any plots.
+  xscale <- cooccur_df$label1 %>%
+    as.character() %>%
+    unique() %>%
+    c(1:(plot_size - length(.)))
+  yscale <- cooccur_df$label2 %>%
+    as.character() %>%
+    unique() %>%
+    #the concatenated labels need to be at the front of the Y scale,
+    #since this will be at the bottom in the plot.
+    c(1:(plot_size - length(.)), .)
   #labels for y axis will be gene names, with extra spaces (at bottom) blank
   ylabels  <- cooccur_df$gene2 %>%
     as.character() %>%
