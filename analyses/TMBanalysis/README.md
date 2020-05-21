@@ -3,59 +3,57 @@
 ###### Authors : Teja Koganti for D3B
 
 This analysis computes tumor mutation burden for different disease types.
-It takes a single MAF file and filters variants  based on
+It takes a single MAF file and filters variants  based filtering strategies from [Friends of Cancer research](https://jitc.bmj.com/content/8/1/e000147#DC1). TMB is computed  based on
+`(filtered variant counts* 1000000) / target BED length`
 
-### Calculate TMB scores
+### The first script `01_calculate_tmb_targetflexible.py`
   1. Reads the MAF file -
       - Calculates VAF
       - Filters based on variant_classification column
-      - Uses pybedtools to only filter variants within target BED
 
-  2. Calculates TMB
-      - Calculates TMB based on ((# of variants)*1000000) / size of BED
-      - Add histology type from metadata file and write to outfile
+  2. Reads in a target config file and determines `experimental strategy` from metadata file. MAF  variants  are filtered within this target file and the BED length is calclulated
+
+  3. Calculates TMB
+      - Calculates TMB based on `((# of variants)*1000000) / size of BED)`
+      - Prints out the samplename, TMB, counts and disease type for every sample
 
 
-   `Usage`: python3 01_calculate_tmb.py [-h] -i MAF_FILE -m METADATAFILE -d DISEASE_COL -s
-                           SAMPLE_COL -t TARGET_BED -c CDS_BED -o OUTFILENAME
+    `Usage`: 01_calculate_tmb_targetflexible.py [-h] -i MAF -m METADATAFILE -o
+                                             OUTFILENAME -w TARGETCONFIG
 
-          optional arguments:
-          -h, --help            show this help message and exit
-          -i MAF_FILE, --maf_file MAF_FILE
-                        path to the MAF file
-          -m METADATAFILE, --metadatafile METADATAFILE
-                        path to the metadata/histology file
-          -d DISEASE_COL, --disease_col DISEASE_COL
-                        Disease column name in metadatafile
-          -s SAMPLE_COL, --sample_col SAMPLE_COL
-                        Sample column name in metadatafile
-          -t TARGET_BED, --target_bed TARGET_BED
-                        target_bed
-          -c CDS_BED, --cds_bed CDS_BED
-                        cds_bed
-          -o OUTFILENAME, --outfilename OUTFILENAME
-                        Out file name
+   optional arguments:
+     -h, --help            show this help message and exit
+     -i MAF, --maf MAF     path to the MAF file
+     -m METADATAFILE, --metadatafile METADATAFILE
+                           path to the metadata/histology file
+     -o OUTFILENAME, --outfilename OUTFILENAME
+                           Out file name
+     -w TARGETCONFIG, --targetconfig TARGETCONFIG
+                           File with experimental strategy and path to BED file
 
    `Output` :
 
-   - [output/pbta-mutect2-tmb_withintarget.txt](https://github.com/d3b-center/d3b-bix-analysis-toolkit/tree/TMBanalysis/analyses/TMBanalysis/output)
-   - [output/pbta-mutect2-tmb_withintarget_and_cds.txt](https://github.com/d3b-center/d3b-bix-analysis-toolkit/blob/feature/tmb_code/analyses/TMBanalysis/output/pbta-mutect2-tmb_withintarget_and_cds.txt)
+   - [output/output/pbta-snv-consensus-mutation_tmb.txt](https://github.com/d3b-center/d3b-bix-analysis-toolkit/blob/feature/tmb_code/analyses/TMBanalysis/output/pnoc003_wxs.target.tmb.txt)
 
 
 ### Plot TMB scores
 
  1. Takes an input file that has sample name, count, TMB and histology type
- 2. Using seaborn module, implement `stripplot` to generate TMB plots per disease type
- 3. Calculates the median line for each disease type
+ 2. Using matplotlib module to implement cumulative distribution function plot for every disease type
+ 3. Uses minimum number of samples under each disease to filter out disease types  
+ 4. Calculates the median line for each disease type
 
-   `Usage` : python3 02_tmbplots.py [-h] -t TMBSCOREFILE -o OUTPLOTNAME
+ `Usage`: 02_cumulative_freq_TMBplot.py [-h] -t TMB_SCORES -o OUTFILENAME -s
+                                   MINSAMPLESTOPLOT
 
-        optional arguments:
-          -h, --help            show this help message and exit
-          -t TMBSCOREFILE, --tmbscorefile TMBSCOREFILE
-                        File with TMB and short_histology columns
-          -o OUTPLOTNAME, --outplotname OUTPLOTNAME
-                        File where the TMB plot should be saved
+optional arguments:
+-h, --help            show this help message and exit
+-t TMB_SCORES, --tmb_scores TMB_SCORES
+                      file with TMB scores
+-o OUTFILENAME, --outfilename OUTFILENAME
+                      Name of the out plot, no extension
+-s MINSAMPLESTOPLOT, --minsamplestoplot MINSAMPLESTOPLOT
+                      Minimum samples from each histology/disease to plot
 
    Cumulative  distribution function plot  here
 
