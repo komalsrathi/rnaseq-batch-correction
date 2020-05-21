@@ -25,9 +25,9 @@ plot_cooccurence <- function(cooccur_df, plot_file, plot_size, divergent_colors,
     #make cooccur plot
     cooccur_plot <- ggplot(
       cooccur_df,
-      aes(x = label1, y = label2, fill = cooccur_score)
+      aes(x = label1, y = label2, color = cooccur_score)
     ) +
-      geom_tile(width = 0.7, height = 0.7) +
+      geom_point(shape = 19, aes(color = cooccur_score)) +
       scale_x_discrete(
         position = "top",
         limits = xscale,
@@ -37,7 +37,7 @@ plot_cooccurence <- function(cooccur_df, plot_file, plot_size, divergent_colors,
         limits = yscale,
         breaks = unique(cooccur_df$label2)
       ) +
-      scale_fill_gradientn(
+      scale_color_gradientn(
         colors = divergent_colors,
         na.value = na_color,
         limits = c(-10, 10),
