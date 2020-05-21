@@ -21,14 +21,14 @@ It takes a single MAF file and filters variants  based filtering strategies from
       `Usage`: 01_calculate_tmb_targetflexible.py [-h] -i MAF -m METADATAFILE -o
                                              OUTFILENAME -w TARGETCONFIG
 
-        optional arguments:
-        -h, --help            show this help message and exit
-        -i MAF, --maf MAF     path to the MAF file
-        -m METADATAFILE, --metadatafile METADATAFILE
+          optional arguments:
+          -h, --help            show this help message and exit
+          -i MAF, --maf MAF     path to the MAF file
+          -m METADATAFILE, --metadatafile METADATAFILE
                            path to the metadata/histology file
-        -o OUTFILENAME, --outfilename OUTFILENAME
+          -o OUTFILENAME, --outfilename OUTFILENAME
                            Out file name
-        -w TARGETCONFIG, --targetconfig TARGETCONFIG
+          -w TARGETCONFIG, --targetconfig TARGETCONFIG
                            File with experimental strategy and path to BED file
 
    `Output` :
