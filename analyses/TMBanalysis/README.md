@@ -33,7 +33,7 @@ It takes a single MAF file and filters variants  based filtering strategies from
 
    `Output` :
 
-   - [output/output/pbta-snv-consensus-mutation_tmb.txt](https://github.com/d3b-center/d3b-bix-analysis-toolkit/blob/feature/tmb_code/analyses/TMBanalysis/output/pnoc003_wxs.target.tmb.txt)
+   - [output/output/pbta-snv-consensus-mutation_tmb.txt](https://github.com/d3b-center/d3b-bix-analysis-toolkit/blob/feature/tmb_code/analyses/TMBanalysis/output/pbta-snv-consensus-mutation_tmb.txt)
 
 
 ### Plot TMB scores
