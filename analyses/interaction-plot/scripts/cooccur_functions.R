@@ -171,3 +171,12 @@ modify_cooc_sum <- function(cooccur_summary) {
   )
   return(cooccur_df)
 }
+
+sig_filter <- function(cooccur_df, p_value) {
+  #Remove columns from the cooccur_df with a p_value higher than the cut-off
+  filtered_df <- cooccur_df %>%
+    dplyr::filter(
+      p <= p_value
+    )
+  return(filtered_df)
+}
