@@ -4,7 +4,7 @@ library(ggplot2)
 library(patchwork)
 
 plot_cooccurence <- function(cooccur_df, plot_file, plot_size, divergent_colors,
-  na_color){
+  na_color, q_cut){
   #take cooccur_df, generate plot, and save to file
   #create scales for consistent sizing
   #The scales will need to have plot_size elements,
@@ -22,12 +22,16 @@ plot_cooccurence <- function(cooccur_df, plot_file, plot_size, divergent_colors,
     #since this will be at the bottom in the plot.
     c(1:(plot_size - length(.)), .)
 
+    #Create a new column 'shape' to label values that are above or
+    #below the provided cutoff
+    cooccur_df$shape <- ifelse(cooccur_df$q <= q_cut, "q<cutoff", "q>cutoff")
+
     #make cooccur plot
     cooccur_plot <- ggplot(
       cooccur_df,
       aes(x = label1, y = label2, color = cooccur_score)
     ) +
-      geom_point(shape = 19, aes(color = cooccur_score)) +
+      geom_point(size = 2, aes(shape = shape)) +
       scale_x_discrete(
         position = "top",
         limits = xscale,
@@ -46,7 +50,8 @@ plot_cooccurence <- function(cooccur_df, plot_file, plot_size, divergent_colors,
       labs(
         x = "",
         y = "",
-        fill = "Co-occurence\nscore"
+        fill = "Co-occurence\nscore",
+        shape = "multiple hypothesis\nadjusted values"
       ) +
       theme_classic() +
       theme(
