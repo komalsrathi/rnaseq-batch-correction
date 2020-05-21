@@ -18,17 +18,17 @@ It takes a single MAF file and filters variants  based filtering strategies from
       - Prints out the samplename, TMB, counts and disease type for every sample
 
 
-    `Usage`: 01_calculate_tmb_targetflexible.py [-h] -i MAF -m METADATAFILE -o
+      `Usage`: 01_calculate_tmb_targetflexible.py [-h] -i MAF -m METADATAFILE -o
                                              OUTFILENAME -w TARGETCONFIG
 
-   optional arguments:
-     -h, --help            show this help message and exit
-     -i MAF, --maf MAF     path to the MAF file
-     -m METADATAFILE, --metadatafile METADATAFILE
+        optional arguments:
+        -h, --help            show this help message and exit
+        -i MAF, --maf MAF     path to the MAF file
+        -m METADATAFILE, --metadatafile METADATAFILE
                            path to the metadata/histology file
-     -o OUTFILENAME, --outfilename OUTFILENAME
+        -o OUTFILENAME, --outfilename OUTFILENAME
                            Out file name
-     -w TARGETCONFIG, --targetconfig TARGETCONFIG
+        -w TARGETCONFIG, --targetconfig TARGETCONFIG
                            File with experimental strategy and path to BED file
 
    `Output` :
@@ -46,15 +46,14 @@ It takes a single MAF file and filters variants  based filtering strategies from
  `Usage`: 02_cumulative_freq_TMBplot.py [-h] -t TMB_SCORES -o OUTFILENAME -s
                                    MINSAMPLESTOPLOT
 
-optional arguments:
--h, --help            show this help message and exit
--t TMB_SCORES, --tmb_scores TMB_SCORES
+    optional arguments:
+      -h, --help            show this help message and exit
+      -t TMB_SCORES, --tmb_scores TMB_SCORES
                       file with TMB scores
--o OUTFILENAME, --outfilename OUTFILENAME
+      -o OUTFILENAME, --outfilename OUTFILENAME
                       Name of the out plot, no extension
--s MINSAMPLESTOPLOT, --minsamplestoplot MINSAMPLESTOPLOT
+      -s MINSAMPLESTOPLOT, --minsamplestoplot MINSAMPLESTOPLOT
                       Minimum samples from each histology/disease to plot
 
    Cumulative  distribution function plot  here
-
    ![](output/pbta-snv-mutect2.CFD.TMB.png)
