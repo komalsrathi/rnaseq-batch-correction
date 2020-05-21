@@ -63,6 +63,13 @@ option_list <- list(
     type = "numeric",
     help = "Highest allowable p value for cooccurrence pairs. Default value: 1,
       no filtering"
+  ),
+  make_option(
+    opt_str = "--q_cut_off",
+    default = 1,
+    type = "numeric",
+    help = "q value cut off for cooccurrence pairs. Default value: 1,
+      no filtering"
   )
 )
 
@@ -80,7 +87,8 @@ out_dir <- file.path(opts$outdir)
 exclude_file <- file.path(opts$exclude)
 script_dir <- file.path(opts$scripts)
 palette_file <- file.path(opts$palette)
-p_cut <- file.path(opts$p_cut_off)
+p_cut <- opts$p_cut_off
+q_cut <- opts$q_cut_off
 print(meta_file)
 print(out_dir)
 print(script_dir)
@@ -171,7 +179,7 @@ for (disease_id in keys(diseases)) {
   plot_file <- file.path(figure_dir, paste("cooccur.", disease_id, ".png",
     sep = ""))
   cooc_plot <- plot_cooccurence(coocur_df, plot_file, plot_size,
-    divergent_colors, na_color)
+    divergent_colors, na_color, q_cut)
 
   #make disease gene plot
   disease_fig <- file.path(figure_dir, paste("gene_disease.", disease_id,
