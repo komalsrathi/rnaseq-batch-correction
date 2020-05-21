@@ -1,13 +1,37 @@
+##  This script takes MAF file and  metadata  file with experimental strategy  and
+#   target config file and computes TMB  scores for every samplename
+####### Author: Teja Koganti ##################
+# Inputs  - 1. MAF file - Consensus should be performed prior to using as INputs
+#               Must follow the MAF format. It's okay  if the first
+#               commented line is absent
+########### 2. metadata file - This should have  disease column and
+#               experimental strategy. Sample should not be  repeated under
+#               different experimental strategies
+########### 3. target config file - This should have two columns,
+#               one with experimental strategy in metadata  and another with the
+#               corresponding BED file for processing variant counts
+
+
+# python3 calculate_tmb_targetflexible.py \
+#   -i pbta-snv-consensus.maf
+#   -m pbta-histologies.tsv \
+#   -w ../inputs/target_cfg \
+#   -o ../output/pbta-snv-consensus-TMB_intarget.txt
+
 import subprocess
 import argparse
 import sys
 
 
+# This checks the packages to be installed if not already
+#   installed by user
 def install_package(package, package_list):
     if not package in package_list:
         print("Installing package " + package)
         pip._internal.main(["install", package])
 
+# This function returns a dictionary where the keys are the experimental_strategy
+#   and the values are the BED files for those target exp_strategies
 def get_target_dict(target_config):
         dict_to_return = {}
         with open(target_config, "r") as target_cfg:
@@ -18,6 +42,10 @@ def get_target_dict(target_config):
         return(dict_to_return)
 
 
+# This is the function where we calulate  the TMB, for every grouped samples,
+#   the function gets  the corresponding target  BED file and calulates the
+#   variants within those target files using pybedtools
+
 def calculate_tmb(grouped_df, meta_data, target_dict, out):
     samplename = np.unique(grouped_df["Tumor_Sample_Barcode"])[0]
     meta_data = meta_data.set_index("Kids_First_Biospecimen_ID")
@@ -26,7 +54,6 @@ def calculate_tmb(grouped_df, meta_data, target_dict, out):
     disease =  meta_data.at[samplename,"short_histology"]
     if exp_strategy in target_dict.keys():
         target_bed = target_dict.get(exp_strategy)
-        #print(target_bed, disease, exp_strategy)
         maf_within_target = pybedtools.BedTool.from_dataframe(grouped_df).intersect(target_bed, u=True)
         mafdf_within_target = pybedtools.BedTool.to_dataframe(maf_within_target, names=cols)
         count = mafdf_within_target.shape[0]
@@ -36,7 +63,7 @@ def calculate_tmb(grouped_df, meta_data, target_dict, out):
         out.write(out_line+"\n")
 
 
-
+# This function takes in BED file and calculates the total length of the BED
 def calculate_bed_length(in_bed):
     total_length = 0
     for line in in_bed:
@@ -149,9 +176,10 @@ target_dict = get_target_dict(args.targetconfig)
 ###########################################################
 
 
-###  Groupby and calculate TMB ####
+############  Groupby and calculate TMB ####################
 outfile = open(args.outfilename, "w")
 outfile.write("Samplename\texperimental_strategy\tdisease\tcount\tbedlength\tTMB\n")
 metadata_df = pd.read_csv(args.metadatafile, sep="\t")
 grouped_maf = maf_file.groupby("Tumor_Sample_Barcode")
 line = grouped_maf.apply(calculate_tmb, metadata_df, target_dict, outfile)
+###############################################################
