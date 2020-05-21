@@ -12,7 +12,7 @@
 #               corresponding BED file for processing variant counts
 
 
-# python3 calculate_tmb_targetflexible.py \
+# python3 01_calculate_tmb_targetflexible.py \
 #   -i pbta-snv-consensus.maf
 #   -m pbta-histologies.tsv \
 #   -w ../inputs/target_cfg \
