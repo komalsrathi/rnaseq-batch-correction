@@ -63,7 +63,6 @@ plot_cooccurence <- function(cooccur_df, plot_file, plot_size, divergent_colors,
         legend.position = c(1, 0),
         legend.key.size = unit(2, "char")
       )
-  print(plot_file)
   ggsave(cooccur_plot, filename = plot_file)
   return(cooccur_plot)
 }
@@ -112,7 +111,6 @@ plot_disease <- function (gene_disease_counts, disease_fig, plot_size,
       legend.justification = c(1, 1),
       legend.key.size = unit(1, "char"))
   #save disease plot
-  print(disease_fig)
   ggsave(disease_plot, filename = disease_fig)
   return(disease_plot)
 }
@@ -171,6 +169,5 @@ combine_plots <- function (cooccur_plot, disease_plot, combined_fig, cooccur_df)
       axis.text.y = element_text(size = 9)
     )
   #save combined plot.
-  print(combined_fig)
   ggsave(combined_plot, filename = combined_fig, width = 8, height = 14)
 }

@@ -133,8 +133,15 @@ for (disease_id in keys(diseases)) {
   maf_filtered <- maf_df %>%
   dplyr::filter(Tumor_Sample_Barcode %in% samples)
 
+  #don't run if there's no samples to run
+  row_count <- nrow(maf_filtered)
+  if (row_count == 0) {
+    print(paste("No samples to be analyzed for", disease_id))
+    next
+  }
+
   # count mutations by gene/sample pair
-  gene_sample_counts <- gene_counts(maf_df, genes)
+  gene_sample_counts <- gene_counts(maf_filtered, genes)
 
   #get most often mutated genes
   top_count_genes <- get_top_genes(gene_sample_counts, max_genes, min_mutated)
