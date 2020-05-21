@@ -56,6 +56,13 @@ option_list <- list(
     default = file.path(getwd(), "scripts"),
     type = "character",
     help = "Scripts directory path."
+  ),
+  make_option(
+    opt_str = "--p_cut_off",
+    default = 1,
+    type = "numeric",
+    help = "Highest allowable p value for cooccurrence pairs. Default value: 1,
+      no filtering"
   )
 )
 
@@ -73,6 +80,7 @@ out_dir <- file.path(opts$outdir)
 exclude_file <- file.path(opts$exclude)
 script_dir <- file.path(opts$scripts)
 palette_file <- file.path(opts$palette)
+p_cut <- file.path(opts$p_cut_off)
 print(meta_file)
 print(out_dir)
 print(script_dir)
@@ -152,6 +160,9 @@ for (disease_id in keys(diseases)) {
 
   #calculate coocurrence
   cooccur_summary <- coocurrence(gene_sample_counts, top_count_genes)
+
+  #remove insignificant gene pairs from cooccur_summary
+  cooccur_summary <- sig_filter(cooccur_summary, p_cut)
 
   #reduce cooccur summary to needed fields and generate labels
   coocur_df <- modify_cooc_sum(cooccur_summary)
