@@ -11,9 +11,11 @@ It takes a single MAF file and filters variants  based filtering strategies from
       - Calculates VAF
       - Filters based on variant_classification column
 
-  2. Reads in a target config file and determines `experimental strategy` from metadata file. MAF  variants  are filtered within this target file and the BED length is calclulated
+  2. Reads in config file and defines metadata specific fields/columns and variants  list etc.
 
-  3. Calculates TMB
+  3. Reads in a target config file and determines `experimental strategy` from metadata file. MAF  variants  are filtered within this target file and the BED length is calculated
+
+  4. Calculates TMB
       - Calculates TMB based on `((# of variants)*1000000) / size of BED)`
       - Prints out the samplename, TMB, counts and disease type for every sample
 
@@ -30,9 +32,11 @@ It takes a single MAF file and filters variants  based filtering strategies from
                            Out file name
           -w TARGETCONFIG, --targetconfig TARGETCONFIG
                            File with experimental strategy and path to BED file
+          -c CONFIGFILE, --configfile CONFIGFILE
+                           calculate_tmb.cfg.txt file with columns for disease,
+                           samplename, variant types etc.                 
 
    `Output` :
-
    - [output/output/pbta-snv-consensus-mutation_tmb.txt](https://github.com/d3b-center/d3b-bix-analysis-toolkit/blob/feature/tmb_code/analyses/TMBanalysis/output/pbta-snv-consensus-mutation_tmb.txt)
 
 
