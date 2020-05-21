@@ -1,6 +1,9 @@
 ## TMB analysis
 
-This analysis computes tumor mutation burden for different disease types
+###### Authors : Teja Koganti for D3B
+
+This analysis computes tumor mutation burden for different disease types.
+It takes a single MAF file and filters variants  based on
 
 ### Calculate TMB scores
   1. Reads the MAF file -
@@ -54,9 +57,6 @@ This analysis computes tumor mutation burden for different disease types
           -o OUTPLOTNAME, --outplotname OUTPLOTNAME
                         File where the TMB plot should be saved
 
-   `Output` :
-   ![](output/pbta-snv-mutect2.TMB.png)
-
-   Cumulative  distribution function of the same fig
+   Cumulative  distribution function plot  here
 
    ![](output/pbta-snv-mutect2.CFD.TMB.png)
