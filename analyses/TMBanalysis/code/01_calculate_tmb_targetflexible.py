@@ -46,12 +46,12 @@ def get_target_dict(target_config):
 #   the function gets  the corresponding target  BED file and calulates the
 #   variants within those target files using pybedtools
 
-def calculate_tmb(grouped_df, meta_data, target_dict, out):
+def calculate_tmb(grouped_df, meta_data, target_dict, out, diseasecol, samplenamecol, targetcol):
     samplename = np.unique(grouped_df["Tumor_Sample_Barcode"])[0]
-    meta_data = meta_data.set_index("Kids_First_Biospecimen_ID")
+    meta_data = meta_data.set_index(samplenamecol)
     cols = list(grouped_df.columns)
-    exp_strategy = meta_data.at[samplename,"experimental_strategy"]
-    disease =  meta_data.at[samplename,"short_histology"]
+    exp_strategy = meta_data.at[samplename,targetcol]
+    disease =  meta_data.at[samplename,diseasecol]
     if exp_strategy in target_dict.keys():
         target_bed = target_dict.get(exp_strategy)
         maf_within_target = pybedtools.BedTool.from_dataframe(grouped_df).intersect(target_bed, u=True)
@@ -61,6 +61,7 @@ def calculate_tmb(grouped_df, meta_data, target_dict, out):
         tmb = (count* 1000000) / bed_length
         out_line = samplename+"\t"+exp_strategy+"\t"+disease+"\t"+str(count)+"\t"+str(bed_length)+"\t"+str(tmb)
         out.write(out_line+"\n")
+
 
 
 # This function takes in BED file and calculates the total length of the BED
@@ -101,32 +102,18 @@ import pybedtools
 import sys
 import pip
 
-
 parser = argparse.ArgumentParser()
 parser.add_argument("-i", "--maf", required=True, help="path to the MAF file")
 parser.add_argument(
     "-m", "--metadatafile", required=True, help="path to the metadata/histology file"
 )
 parser.add_argument("-o", "--outfilename", required=True, help="Out file name")
+parser.add_argument("-c", "--configfile", required=True, help="calculate_tmb.cfg.txt file with columns for disease, samplename, variant types etc.")
 parser.add_argument("-w", "--targetconfig", required=True, help="File with experimental strategy  and path to BED file")
 args = parser.parse_args()
 
-
-########################################################
-###########Defining MAF columns and types###############
-#
-#
-# Based on "Friends of Cancer Research TMB Harmonization Project paper"
-# "https://jitc.bmj.com/content/8/1/e000147#DC1"
-
-var_class = [
-    "Missense_Mutation",
-    "Nonsense_Mutation",
-    "Frame_Shift_Del",
-    "Frame_Shift_Ins",
-    "In_Frame_Del",
-    "In_Frame_Ins",
-]
+################################################################
+# Defining MAF columns and metadata spcific fields from config #
 
 needed_cols = [
     "Chromosome",
@@ -149,10 +136,23 @@ needed_cols = [
     "Allele",
     "flanking_bps",
 ]
+
+with open(args.configfile) as configlines:
+    for line in configlines.readlines():
+        if line.startswith("Variants_to_use_for_TMB="):
+            stripped_line = line.strip("Variants_to_use_for_TMB=").rstrip("\n")
+            var_class = stripped_line.split(",")
+        if line.startswith("disease_column="):
+            disease_col = line.lstrip("disease_column").lstrip("=").rstrip("\n")
+        if line.startswith("samplename_column="):
+            samplename_col=line.lstrip("samplename_column").lstrip("=").rstrip("\n")
+        if line.startswith("typeoftargetcolumn="):
+            typeoftargetcol = line.lstrip("typeoftargetcolumn").lstrip("=").rstrip("\n")
+
 ###########################################################
 
 
-####Preparing MAF file #####################################
+####### Preparing MAF file ##################################
 # Loading MAF file
 maf_file = pd.read_table(args.maf, na_values=["."], comment="#", sep="\t")
 maf_file = maf_file.drop_duplicates(keep=False)
@@ -173,13 +173,13 @@ maf_file["VAF"] = maf_file["t_alt_count"] / (
 
 ########### Preparing target files ########################
 target_dict = get_target_dict(args.targetconfig)
-###########################################################
+############################################################
 
 
-############  Groupby and calculate TMB ####################
+############  Groupby and calculate TMB #####################
 outfile = open(args.outfilename, "w")
 outfile.write("Samplename\texperimental_strategy\tdisease\tcount\tbedlength\tTMB\n")
 metadata_df = pd.read_csv(args.metadatafile, sep="\t")
 grouped_maf = maf_file.groupby("Tumor_Sample_Barcode")
-line = grouped_maf.apply(calculate_tmb, metadata_df, target_dict, outfile)
+line = grouped_maf.apply(calculate_tmb, metadata_df, target_dict, outfile, disease_col, samplename_col, typeoftargetcol)
 ###############################################################
