@@ -6,7 +6,7 @@ This analysis computes tumor mutation burden for different disease types.
 It takes a single MAF file and filters variants  based filtering strategies from [Friends of Cancer research](https://jitc.bmj.com/content/8/1/e000147#DC1). TMB is computed  based on
 `(filtered variant counts* 1000000) / target BED length`
 
-### The first script `01_calculate_tmb_targetflexible.py`
+### Calculate TMB
   1. Reads the MAF file -
       - Calculates VAF
       - Filters based on variant_classification column
