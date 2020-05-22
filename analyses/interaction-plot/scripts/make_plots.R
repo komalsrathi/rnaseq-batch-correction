@@ -24,7 +24,8 @@ plot_cooccurence <- function(cooccur_df, plot_file, plot_size, divergent_colors,
 
     #Create a new column 'shape' to label values that are above or
     #below the provided cutoff
-    cooccur_df$shape <- ifelse(cooccur_df$q <= q_cut, "q<cutoff", "q>cutoff")
+    cooccur_df$shape <- ifelse(cooccur_df$q <= q_cut,
+      paste("q <=", q_cut), paste("q >", q_cut))
 
     #make cooccur plot
     cooccur_plot <- ggplot(
