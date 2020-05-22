@@ -29,7 +29,7 @@ plot_cooccurence <- function(cooccur_df, plot_file, plot_size, divergent_colors,
     #make cooccur plot
     cooccur_plot <- ggplot(
       cooccur_df,
-      aes(x = label1, y = label2, color = cooccur_score)
+      aes(x = label1, y = label2, color = cooccur_score, reorder(label1, label2))
     ) +
       geom_point(size = 2, aes(shape = shape)) +
       scale_x_discrete(
