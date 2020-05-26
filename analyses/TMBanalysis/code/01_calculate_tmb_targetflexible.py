@@ -30,38 +30,57 @@ def install_package(package, package_list):
         print("Installing package " + package)
         pip._internal.main(["install", package])
 
+
 # This function returns a dictionary where the keys are the experimental_strategy
 #   and the values are the BED files for those target exp_strategies
 def get_target_dict(target_config):
-        dict_to_return = {}
-        with open(target_config, "r") as target_cfg:
-                for line in target_cfg.readlines():
-                        line=line.split()
-                        #print(line)
-                        dict_to_return[line[0]] = line[1]
-        return(dict_to_return)
+    dict_to_return = {}
+    with open(target_config, "r") as target_cfg:
+        for line in target_cfg.readlines():
+            line = line.split()
+            # print(line)
+            dict_to_return[line[0]] = line[1]
+    return dict_to_return
 
 
 # This is the function where we calulate  the TMB, for every grouped samples,
 #   the function gets  the corresponding target  BED file and calulates the
 #   variants within those target files using pybedtools
 
-def calculate_tmb(grouped_df, meta_data, target_dict, out, diseasecol, samplenamecol, targetcol):
+
+def calculate_tmb(
+    grouped_df, meta_data, target_dict, out, diseasecol, samplenamecol, targetcol
+):
     samplename = np.unique(grouped_df["Tumor_Sample_Barcode"])[0]
     meta_data = meta_data.set_index(samplenamecol)
     cols = list(grouped_df.columns)
-    exp_strategy = meta_data.at[samplename,targetcol]
-    disease =  meta_data.at[samplename,diseasecol]
+    exp_strategy = meta_data.at[samplename, targetcol]
+    disease = meta_data.at[samplename, diseasecol]
     if exp_strategy in target_dict.keys():
         target_bed = target_dict.get(exp_strategy)
-        maf_within_target = pybedtools.BedTool.from_dataframe(grouped_df).intersect(target_bed, u=True)
-        mafdf_within_target = pybedtools.BedTool.to_dataframe(maf_within_target, names=cols)
+        maf_within_target = pybedtools.BedTool.from_dataframe(grouped_df).intersect(
+            target_bed, u=True
+        )
+        mafdf_within_target = pybedtools.BedTool.to_dataframe(
+            maf_within_target, names=cols
+        )
         count = mafdf_within_target.shape[0]
         bed_length = calculate_bed_length(open(target_bed, "r"))
-        tmb = (count* 1000000) / bed_length
-        out_line = samplename+"\t"+exp_strategy+"\t"+disease+"\t"+str(count)+"\t"+str(bed_length)+"\t"+str(tmb)
-        out.write(out_line+"\n")
-
+        tmb = (count * 1000000) / bed_length
+        out_line = (
+            samplename
+            + "\t"
+            + exp_strategy
+            + "\t"
+            + disease
+            + "\t"
+            + str(count)
+            + "\t"
+            + str(bed_length)
+            + "\t"
+            + str(tmb)
+        )
+        out.write(out_line + "\n")
 
 
 # This function takes in BED file and calculates the total length of the BED
@@ -108,8 +127,18 @@ parser.add_argument(
     "-m", "--metadatafile", required=True, help="path to the metadata/histology file"
 )
 parser.add_argument("-o", "--outfilename", required=True, help="Out file name")
-parser.add_argument("-c", "--configfile", required=True, help="calculate_tmb.cfg.txt file with columns for disease, samplename, variant types etc.")
-parser.add_argument("-w", "--targetconfig", required=True, help="File with experimental strategy  and path to BED file")
+parser.add_argument(
+    "-c",
+    "--configfile",
+    required=True,
+    help="calculate_tmb.cfg.txt file with columns for disease, samplename, variant types etc.",
+)
+parser.add_argument(
+    "-w",
+    "--targetconfig",
+    required=True,
+    help="File with experimental strategy  and path to BED file",
+)
 args = parser.parse_args()
 
 ################################################################
@@ -145,7 +174,7 @@ with open(args.configfile) as configlines:
         if line.startswith("disease_column="):
             disease_col = line.lstrip("disease_column").lstrip("=").rstrip("\n")
         if line.startswith("samplename_column="):
-            samplename_col=line.lstrip("samplename_column").lstrip("=").rstrip("\n")
+            samplename_col = line.lstrip("samplename_column").lstrip("=").rstrip("\n")
         if line.startswith("typeoftargetcolumn="):
             typeoftargetcol = line.lstrip("typeoftargetcolumn").lstrip("=").rstrip("\n")
 
@@ -181,5 +210,13 @@ outfile = open(args.outfilename, "w")
 outfile.write("Samplename\texperimental_strategy\tdisease\tcount\tbedlength\tTMB\n")
 metadata_df = pd.read_csv(args.metadatafile, sep="\t")
 grouped_maf = maf_file.groupby("Tumor_Sample_Barcode")
-line = grouped_maf.apply(calculate_tmb, metadata_df, target_dict, outfile, disease_col, samplename_col, typeoftargetcol)
+line = grouped_maf.apply(
+    calculate_tmb,
+    metadata_df,
+    target_dict,
+    outfile,
+    disease_col,
+    samplename_col,
+    typeoftargetcol,
+)
 ###############################################################
