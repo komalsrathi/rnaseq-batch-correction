@@ -76,14 +76,20 @@ plot_cooccurence <- function(cooccur_df, plot_file, plot_size, divergent_colors,
 plot_disease <- function (gene_disease_counts, disease_fig, plot_size,
   divergent_colors, na_color) {
   #Make gene by disease chart.
+
+  #make a list of genes that will be used for the x axis of the plot
+  genes_for_display <- unique(gene_disease_counts$gene)
+
   disease_gene_df <- gene_disease_counts %>%
-    dplyr::mutate(gene = factor(gene, levels = gene))
-    display_diseases <- disease_gene_df %>%
+    dplyr::mutate(gene = factor(gene, levels = genes_for_display))
+
+  display_diseases <- disease_gene_df %>%
     dplyr::group_by(disease) %>%
     dplyr::tally(wt = mutant_samples) %>%
     dplyr::arrange(desc(n)) %>%
     head(7) %>% # seven so we end up with 8 total for color reasons
     dplyr::pull(disease)
+
   disease_gene_df <- disease_gene_df %>%
     dplyr::mutate(disease_factor =
       forcats::fct_other(disease, keep = display_diseases) %>%
