@@ -11,14 +11,20 @@ if (!("tidyverse" %in% installed.packages())){
 if (!("optparse" %in% installed.packages())){
   install.packages("optparse")
 }
+if (!("gplots" %in% installed.packages())){
+  install.packages("gplots")
+}
+if (!("RColorBrewer" %in% installed.packages())){
+  install.packages("RColorBrewer")
+}
 
 # load required packages
 suppressPackageStartupMessages(library("tidyverse"))
 suppressPackageStartupMessages(library("deconstructSigs"))
 suppressPackageStartupMessages(library("optparse"))
 suppressPackageStartupMessages(library("reshape2"))
-library(RColorBrewer)
-library(gplots)
+suppressPackageStartupMessages(library("RColorBrewer"))
+suppressPackageStartupMessages(library("gplots"))
 
 option_list <- list(
   make_option(c("-i", "--maf"),
@@ -168,6 +174,7 @@ bubble_matrix_plot(deconstructSigs_output,
 
 # Step 3. Barplot plot per short histology
 # Keep only primary tumors
+print(opt$ind_sample)
 ind_samples <- readr::read_tsv(file.path(root_dir, opt$ind_sample))
 # filter run_deconstructSigs() output
 deconstructSigs_output_primary <- deconstructSigs_output %>%
@@ -189,7 +196,7 @@ lapply(unique(deconstructSigs_output$short_histology),
 width_size_cm<-40*length(unique(metadata_df[,"Tumor_Sample_Barcode"]))
 perSample_matrix_plot(deconstructSigs_output,
                    label = label,
-                   color_palette = NA) +
+                   color_palette = gradient_col_palette$hex_codes) +
   ggsave(
   file.path(root_dir, "analyses",
             "mutational_signatures",
@@ -210,5 +217,6 @@ png(filename = file.path(root_dir, "analyses",
     width = width_size_cm, height = 20, units = "cm", res = 200)
 perSample_matrix_plot(deconstructSigs_output,
                       label = label,
-                      cluster = TRUE)
+                      cluster = TRUE,
+                      color_palette = gradient_col_palette$hex_codes)
 dev.off()
