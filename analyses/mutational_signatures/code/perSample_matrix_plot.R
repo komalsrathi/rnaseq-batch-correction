@@ -32,7 +32,6 @@ perSample_matrix_plot <- function(sig_num_df,
                     ggplot2::aes(x = Tumor_Sample_Barcode,
                                  y = forcats::fct_rev(signature))) +
       ggplot2::geom_tile(aes(fill = med_num)) +
-      ggplot2::geom_text(aes(label = round(med_num, 1))) +
       ggplot2::theme_classic() +
       ggplot2::theme(
         axis.text.x = ggplot2::element_text(angle = 55, hjust = -.01),
