@@ -126,7 +126,10 @@ diseases <- hash(
 
 #read inputs
 meta_df <- readr::read_tsv(meta_file, col_types = readr::cols(),
-  guess_max = 10000)
+  guess_max = 10000) %>%
+  dplyr::select("Kids_First_Biospecimen_ID","short_histology") %>%
+  unique()
+
 sample_df <- readr::read_tsv(sample_file, col_types = readr::cols())
 maf_df <- data.table::fread(maf_file, data.table = FALSE)
 maf_df <- reduce_maf(maf_df)
