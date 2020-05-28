@@ -34,6 +34,14 @@ Options:
 	--scripts=SCRIPTS
 		Scripts directory path.
 
+	--p_cut_off=P_CUT_OFF
+		Highest allowable p value for cooccurrence pairs. Default value: 1,
+      no filtering
+
+	--q_cut_off=Q_CUT_OFF
+		q value cut off for cooccurrence pairs. Default value: 1,
+      no filtering
+
 	-h, --help
 		Show this help message and exit
 ```
