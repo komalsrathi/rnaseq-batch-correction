@@ -182,7 +182,7 @@ for (disease_id in keys(diseases)) {
   }
 
   #remove unwanted variant types from maf
-
+  maf_filtered <- filter_mutations(maf_filtered, include_types)
 
   # count mutations by gene/sample pair
   gene_sample_counts <- gene_counts(maf_filtered, genes)

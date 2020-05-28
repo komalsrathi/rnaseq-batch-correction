@@ -19,51 +19,13 @@ row_fisher <- function(w, x, y, z) {
   return(fisher$p.value)
 }
 
-#' Filter mutations based on VAF and effect
-#'
-#' @param maf_df a data frame of a maf file or subset of one. Minimally includes
-#'   `Consequence` column and either `vaf` or both `t_ref_count` and `t_alt_count`.
-#' @param min_vaf The minimum VAF to include.
-#' @param min_depth The minimum sequencing depth to include.
-#' @param exclude_consequence A vector of consequences (as strings) that should
-#'   be excluded in the filtered results. Note that if a mutation has multiple
-#'   consequences, it will not be excluded unless ALL consequences are excluded.
-#' @param include_consequence A vector of consequences (as strings) that should
-#'   be included in the filtered results.
-#'
-#' @return A filtered data frame, with the same columns as the input `maf_df`,
-#'   with VAF added if not already present.
-filter_mutations <- function(maf_df,
-                             min_vaf = 0,
-                             min_depth = 0,
-                             exclude_var_class = c(),
-                             include_var_class = c()) {
-  if (length(exclude_var_class) > 0 && length(include_var_class) > 0) {
-    warning(
-      "Both excluding and including consequences at the same time may have unexpected results."
-    )
-  }
-  if (!("vaf" %in% colnames(maf_df))) {
-    maf_df <- maf_df %>%
-      dplyr::mutate(vaf = t_alt_count / (t_ref_count + t_alt_count))
-  }
-
-  # filter on vaf, depth, and variant class
+filter_mutations <- function(maf_df, include_var_class) {
+  #remove unwanted variant types from the maf_df
   maf_df <- maf_df %>%
-    dplyr::filter(
-      vaf >= min_vaf,
-      (t_ref_count + t_alt_count) > min_depth
-    ) %>%
-    dplyr::filter(!(Variant_Classification %in% exclude_var_class))
-
-  if (length(include_var_class) > 0) {
-    maf_df <- maf_df %>%
-      dplyr::filter(Variant_Classification %in% include_var_class)
-  }
+    dplyr::filter(Variant_Classification %in% include_var_class)
+  print(maf_df)
+  return(maf_df)
 }
-
-
-
 
 #' Calculate co-occurence relationships for a list of genes
 #'
