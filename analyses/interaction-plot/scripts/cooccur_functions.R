@@ -23,7 +23,6 @@ filter_mutations <- function(maf_df, include_var_class) {
   #remove unwanted variant types from the maf_df
   maf_df <- maf_df %>%
     dplyr::filter(Variant_Classification %in% include_var_class)
-  print(maf_df)
   return(maf_df)
 }
 
