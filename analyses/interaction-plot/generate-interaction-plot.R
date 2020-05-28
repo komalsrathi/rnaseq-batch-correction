@@ -70,6 +70,25 @@ option_list <- list(
     type = "numeric",
     help = "q value cut off for cooccurrence pairs. Default value: 1,
       no filtering"
+  ),
+  make_option(
+  opt_str = "--include_syn",
+  action = "store_true",
+  default = FALSE,
+
+  help = "Include synonymous coding mutations"
+  ),
+  make_option(
+    opt_str = "--include_noncoding",
+    action = "store_true",
+    default = FALSE,
+    help = "Include noncoding mutations (within transcript)"
+  ),
+  make_option(
+    opt_str = "--include_nontranscribed",
+    action = "store_true",
+    default = FALSE,
+    help = "Include nontranscribed (upstream & downstream) mutations"
   )
 )
 
@@ -124,6 +143,9 @@ diseases <- hash(
 "Craniopharyngioma" = "Craniopharyngioma"
 )
 
+#determine which variant types to include
+include_types <- set_var_types(opts)
+
 #read inputs
 meta_df <- readr::read_tsv(meta_file, col_types = readr::cols(),
   guess_max = 10000) %>%
@@ -158,6 +180,9 @@ for (disease_id in keys(diseases)) {
     print(paste("No samples to be analyzed for", disease_id))
     next
   }
+
+  #remove unwanted variant types from maf
+
 
   # count mutations by gene/sample pair
   gene_sample_counts <- gene_counts(maf_filtered, genes)
