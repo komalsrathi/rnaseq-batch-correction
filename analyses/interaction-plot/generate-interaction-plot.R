@@ -198,10 +198,17 @@ for (disease_id in keys(diseases)) {
   cooccur_summary <- coocurrence(gene_sample_counts, top_count_genes)
 
   #remove insignificant gene pairs from cooccur_summary
-  cooccur_summary <- sig_filter(cooccur_summary, p_cut)
+  cooccur_sig <- sig_filter(cooccur_summary, p_cut)
+
+  #don't run if there's no significant coccurrence pairs to run
+  row_count <- nrow(cooccur_sig)
+  if (row_count == 0) {
+    print(paste("No significant cooccurrences for", disease_id))
+    next
+  }
 
   #reduce cooccur summary to needed fields and generate labels
-  coocur_df <- modify_cooc_sum(cooccur_summary)
+  coocur_df <- modify_cooc_sum(cooccur_sig)
 
   #make cooccur_plot
   plot_file <- file.path(figure_dir, paste("cooccur.", disease_id, ".png",
