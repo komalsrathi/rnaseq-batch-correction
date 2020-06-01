@@ -2,4 +2,5 @@
 *
 # Except this file and foler
 !.gitignore
+!histologies/
 !histologies/*
