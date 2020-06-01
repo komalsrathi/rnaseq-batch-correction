@@ -20,7 +20,12 @@ Options:
 
 	--exclude=EXCLUDE
 		File path with a table of genes to be excluded from the figure.
-      A tsv file which must contain a column named 'gene` that contains Hugo Symbols
+      A tsv file which must contain a column named 'gene' that contains Hugo Symbols
+
+	--include=INCLUDE
+		File path with a list of genes to be included in the analysis.
+      A tsv file which must contain a column named 'gene' that contains Hugo Symbols.
+      When using this option, the exclude gene list will be ignored.
 
 	--samples=CHARACTER
 		File path to sample file to be analyzed. Can be .gz compressed.
@@ -41,6 +46,15 @@ Options:
 	--q_cut_off=Q_CUT_OFF
 		q value cut off for cooccurrence pairs. Default value: 1,
       no filtering
+
+	--include_syn
+		Include synonymous coding mutations
+
+	--include_noncoding
+		Include noncoding mutations (within transcript)
+
+	--include_nontranscribed
+		Include nontranscribed (upstream & downstream) mutations
 
 	-h, --help
 		Show this help message and exit
