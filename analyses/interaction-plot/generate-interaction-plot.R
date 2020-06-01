@@ -31,7 +31,14 @@ option_list <- list(
     default = file.path(getwd(), "exclude-genes.txt"),
     type = "character",
     help = "File path with a table of genes to be excluded from the figure.
-      A tsv file which must contain a column named 'gene` that contains Hugo Symbols"
+      A tsv file which must contain a column named 'gene' that contains Hugo Symbols"
+  ),
+  make_option(
+    opt_str = "--include",
+    type = "character",
+    help = "File path with a list of genes to be included in the analysis.
+      A tsv file which must contain a column named 'gene' that contains Hugo Symbols.
+      When using this option, the exclude gene list will be ignored."
   ),
   make_option(
     opt_str = "--samples",
@@ -156,12 +163,21 @@ sample_df <- readr::read_tsv(sample_file, col_types = readr::cols())
 maf_df <- data.table::fread(maf_file, data.table = FALSE)
 maf_df <- reduce_maf(maf_df)
 
+if (! is.null(opts$include)) {
+  include_file <- file.path(opts$include)
+  include_list <- readr::read_tsv(include_file, col_types = readr::cols())
+}
+
 #run analysis for each disease
 for (disease_id in keys(diseases)) {
   print(disease_id)
 
   #get the gene list
-  genes <- get_gene_list(maf_df, exclude_file, disease_id)
+  if (exists("include_list")) {
+    genes <- include_list$gene
+  } else {
+    genes <- get_gene_list(maf_df, exclude_file, disease_id)
+  }
 
   #get samples with the disease
   samples <- samples_with_disease(meta_df, sample_df, disease_id)
