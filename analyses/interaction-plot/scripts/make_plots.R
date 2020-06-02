@@ -2,6 +2,53 @@
 
 library(ggplot2)
 library(patchwork)
+library(corrplot)
+library(reshape2)
+
+plot_corr <- function(cooccur_df, corr_file, plot_size,
+  divergent_colors, na_color) {
+  #use corrplot to make an alternative plot
+  temp_df <- data.frame(cooccur_df$gene1, cooccur_df$gene2,
+    as.numeric(cooccur_df$cooccur_score), as.numeric(cooccur_df$q))
+  names(temp_df) <- c("gene1", "gene2", "cooccur_score", "q")
+
+  #flip gene 1 and gene2 to make the matrix at the end symmetrical
+  temp2_df <- data.frame(cooccur_df$gene2, cooccur_df$gene1,
+    as.numeric(cooccur_df$cooccur_score), as.numeric(cooccur_df$q))
+  names(temp2_df) <- c("gene1", "gene2", "cooccur_score", "q")
+
+  temp_df <- rbind(temp_df, temp2_df)
+
+  #convert cooccurrence score to matrix
+  matrix <- dcast(temp_df, gene2~gene1, value.var = "cooccur_score")
+  # convert gene2 to rownames to have numeric matrix
+  rownames(matrix) <- matrix$gene2
+  # remove the gene2 column which is now a rownames
+  matrix <- matrix[,-1]
+  # change NA to 0 to plot blanks in corrplot grid
+  matrix[is.na(matrix)] <- 0
+
+  #convert q score to matrix
+  q_mat <- dcast(temp_df, gene2~gene1, value.var = "q")
+  # convert gene2 to rownames to have numeric matrix
+  rownames(q_mat) <- q_mat$gene2
+  # remove the gene2 column which is now a rownames
+  q_mat <- q_mat[,-1]
+  # change NA to 0 to plot blanks in corrplot grid
+  q_mat[is.na(q_mat)] <- 1
+
+  #setup color gradient
+  grad <- colorRampPalette(divergent_colors)
+
+  #make plot and save to file
+  png(file = corr_file)
+  corrplot(as.matrix(matrix), method = "square", is.corr = FALSE,type = "upper",
+    ,tl.cex = 0.7,tl.col = "black", col = grad(100))
+  #corrplot(as.matrix(matrix), is.corr = FALSE, p.mat = unlist(q_mat[0]),
+  #  sig.level = 0.000001, insig = "pch")
+  dev.off()
+  return()
+  }
 
 plot_cooccurence <- function(cooccur_df, plot_file, plot_size, divergent_colors,
   na_color, q_cut){
@@ -13,14 +60,10 @@ plot_cooccurence <- function(cooccur_df, plot_file, plot_size, divergent_colors,
   #where n is the number of extra labels needed for the scale
   xscale <- cooccur_df$label1 %>%
     as.character() %>%
-    unique() %>%
-    c(1:(plot_size - length(.)))
+    unique()
   yscale <- cooccur_df$label2 %>%
     as.character() %>%
-    unique() %>%
-    #the concatenated labels need to be at the front of the Y scale,
-    #since this will be at the bottom in the plot.
-    c(1:(plot_size - length(.)), .)
+    unique()
 
     #Create a new column 'shape' to label values that are above or
     #below the provided cutoff
@@ -65,9 +108,8 @@ plot_cooccurence <- function(cooccur_df, plot_file, plot_size, divergent_colors,
         axis.text.y = element_text(size = 6),
         axis.line = element_blank(),
         axis.ticks = element_blank(),
-        legend.justification = c(1, 0),
-        legend.position = c(1, 0),
-        legend.key.size = unit(2, "char")
+        panel.grid.major = element_line(color="grey80", size = 0.5),
+        panel.border = element_rect(color="grey80", size = 0.5, fill = NA)
       )
   ggsave(cooccur_plot, filename = plot_file)
   return(cooccur_plot)
@@ -132,14 +174,14 @@ combine_plots <- function (cooccur_plot, disease_plot, combined_fig, cooccur_df)
   #NOT a generic function to combine any plots.
   xscale <- cooccur_df$label1 %>%
     as.character() %>%
-    unique() %>%
-    c(1:(plot_size - length(.)))
+    unique()
+    #c(1:(plot_size - length(.)))
   yscale <- cooccur_df$label2 %>%
     as.character() %>%
-    unique() %>%
+    unique()
     #the concatenated labels need to be at the front of the Y scale,
     #since this will be at the bottom in the plot.
-    c(1:(plot_size - length(.)), .)
+    #c(1:(plot_size - length(.)), .)
   #labels for y axis will be gene names, with extra spaces (at bottom) blank
   ylabels  <- cooccur_df$gene2 %>%
     as.character() %>%
@@ -147,15 +189,17 @@ combine_plots <- function (cooccur_plot, disease_plot, combined_fig, cooccur_df)
     c(rep("", plot_size - length(.)), .)
   cooccur_plot2 <- cooccur_plot +
     scale_x_discrete(
+      position = "top",
       limits = xscale,
-      breaks = c()
+      breaks = unique(cooccur_df$label1)
     ) +
     scale_y_discrete(
       limits = yscale,
       labels = ylabels
     ) +
     theme(
-      plot.margin = unit(c(-3.5, 0, 0, 0), "char")# negative top margin to move plots together
+      plot.margin = unit(c(-3.5, 0, 0, 0), "char"),# negative top margin to move plots together
+      panel.grid.major = element_line(color = "grey80", size = 0.5)
     )
   #Move labels and themes for disease plot
   disease_plot2 <- disease_plot +

@@ -226,6 +226,12 @@ for (disease_id in keys(diseases)) {
   #reduce cooccur summary to needed fields and generate labels
   coocur_df <- modify_cooc_sum(cooccur_sig)
 
+  #try out corrplot
+  corr_file <- file.path(figure_dir, paste("corr.", disease_id, ".png",
+    sep = ""))
+  corr_plot <- plot_corr(coocur_df, corr_file, plot_size,
+    divergent_colors, na_color)
+
   #make cooccur_plot
   plot_file <- file.path(figure_dir, paste("cooccur.", disease_id, ".png",
     sep = ""))
