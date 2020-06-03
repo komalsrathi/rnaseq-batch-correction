@@ -230,7 +230,7 @@ for (disease_id in keys(diseases)) {
   corr_file <- file.path(figure_dir, paste("corr.", disease_id, ".png",
     sep = ""))
   corr_plot <- plot_corr(coocur_df, corr_file, plot_size,
-    divergent_colors, na_color)
+    divergent_colors, na_color, q_cut)
 
   #make cooccur_plot
   plot_file <- file.path(figure_dir, paste("cooccur.", disease_id, ".png",

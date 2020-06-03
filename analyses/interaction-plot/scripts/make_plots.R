@@ -8,29 +8,29 @@ library(reshape2)
 plot_corr <- function(cooccur_df, corr_file, plot_size,
                       divergent_colors, na_color, q_cut) {
   #use corrplot to make an alternative plot
-  temp_df <- data.frame(cooccur_df$gene1, cooccur_df$gene2,
+  temp_df <- data.frame(cooccur_df$label1, cooccur_df$label2,
     as.numeric(cooccur_df$cooccur_score), as.numeric(cooccur_df$q))
-  names(temp_df) <- c("gene1", "gene2", "cooccur_score", "q")
+  names(temp_df) <- c("label1", "label2", "cooccur_score", "q")
 
   #flip gene 1 and gene2 to make the matrix at the end symmetrical
-  temp2_df <- data.frame(cooccur_df$gene2, cooccur_df$gene1,
+  temp2_df <- data.frame(cooccur_df$label2, cooccur_df$label1,
     as.numeric(cooccur_df$cooccur_score), as.numeric(cooccur_df$q))
-  names(temp2_df) <- c("gene1", "gene2", "cooccur_score", "q")
+  names(temp2_df) <- c("label1", "label2", "cooccur_score", "q")
   temp_df <- rbind(temp_df, temp2_df)
 
   #convert cooccurrence score to matrix
-  matrix <- dcast(temp_df, gene2~gene1, value.var = "cooccur_score")
+  matrix <- dcast(temp_df, label2~label1, value.var = "cooccur_score")
   # convert gene2 to rownames to have numeric matrix
-  rownames(matrix) <- matrix$gene2
+  rownames(matrix) <- matrix$label2
   # remove the gene2 column which is now a rownames
   matrix <- matrix[,-1]
   # change NA to 0 to plot blanks in corrplot grid
   matrix[is.na(matrix)] <- 0
 
   #convert q score to matrix
-  q_mat <- dcast(temp_df, gene2~gene1, value.var = "q")
+  q_mat <- dcast(temp_df, label2~label1, value.var = "q")
   # convert gene2 to rownames to have numeric matrix
-  rownames(q_mat) <- q_mat$gene2
+  rownames(q_mat) <- q_mat$label2
   # remove the gene2 column which is now a rownames
   q_mat <- q_mat[,-1]
   # change NA to 0 to plot blanks in corrplot grid
