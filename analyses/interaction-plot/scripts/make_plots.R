@@ -6,19 +6,16 @@ library(corrplot)
 library(reshape2)
 
 plot_corr <- function(cooccur_df, corr_file, plot_size,
-  divergent_colors, na_color) {
+                      divergent_colors, na_color) {
   #use corrplot to make an alternative plot
   temp_df <- data.frame(cooccur_df$gene1, cooccur_df$gene2,
-    as.numeric(cooccur_df$cooccur_score), as.numeric(cooccur_df$q))
+                        as.numeric(cooccur_df$cooccur_score), as.numeric(cooccur_df$q))
   names(temp_df) <- c("gene1", "gene2", "cooccur_score", "q")
-
   #flip gene 1 and gene2 to make the matrix at the end symmetrical
   temp2_df <- data.frame(cooccur_df$gene2, cooccur_df$gene1,
-    as.numeric(cooccur_df$cooccur_score), as.numeric(cooccur_df$q))
+                         as.numeric(cooccur_df$cooccur_score), as.numeric(cooccur_df$q))
   names(temp2_df) <- c("gene1", "gene2", "cooccur_score", "q")
-
   temp_df <- rbind(temp_df, temp2_df)
-
   #convert cooccurrence score to matrix
   matrix <- dcast(temp_df, gene2~gene1, value.var = "cooccur_score")
   # convert gene2 to rownames to have numeric matrix
@@ -27,7 +24,6 @@ plot_corr <- function(cooccur_df, corr_file, plot_size,
   matrix <- matrix[,-1]
   # change NA to 0 to plot blanks in corrplot grid
   matrix[is.na(matrix)] <- 0
-
   #convert q score to matrix
   q_mat <- dcast(temp_df, gene2~gene1, value.var = "q")
   # convert gene2 to rownames to have numeric matrix
@@ -36,19 +32,18 @@ plot_corr <- function(cooccur_df, corr_file, plot_size,
   q_mat <- q_mat[,-1]
   # change NA to 0 to plot blanks in corrplot grid
   q_mat[is.na(q_mat)] <- 1
-
   #setup color gradient
   grad <- colorRampPalette(divergent_colors)
-
   #make plot and save to file
   png(file = corr_file)
   corrplot(as.matrix(matrix), method = "square", is.corr = FALSE,type = "upper",
-    ,tl.cex = 0.7,tl.col = "black", col = grad(100))
+           ,tl.cex = 0.7,tl.col = "black", col = divergent_colors,
+           p.mat = as.matrix(q_mat),insig = "label_sig",sig.level = c(.001, .01, .05), pch.col = "white",pch.cex = 1)
   #corrplot(as.matrix(matrix), is.corr = FALSE, p.mat = unlist(q_mat[0]),
   #  sig.level = 0.000001, insig = "pch")
   dev.off()
   return()
-  }
+}
 
 plot_cooccurence <- function(cooccur_df, plot_file, plot_size, divergent_colors,
   na_color, q_cut){
