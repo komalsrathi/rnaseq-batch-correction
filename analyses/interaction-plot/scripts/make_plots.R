@@ -33,8 +33,6 @@ plot_corr <- function(cooccur_df, corr_file, plot_size,
   rownames(q_mat) <- q_mat$label2
   # remove the gene2 column which is now a rownames
   q_mat <- q_mat[,-1]
-  # change NA to 0 to plot blanks in corrplot grid
-  q_mat[is.na(q_mat)] <- 1
 
   #setup color gradient
   grad <- colorRampPalette(divergent_colors)
@@ -43,8 +41,8 @@ plot_corr <- function(cooccur_df, corr_file, plot_size,
   png(file = corr_file)
   corrplot(as.matrix(matrix), method = "square", is.corr = FALSE,type = "upper",
     tl.cex = 0.7, tl.col = "black", col = grad(100),
-           p.mat = as.matrix(q_mat), insig = "label_sig",
-           sig.level = q_cut, pch.col = "white", pch.cex = 1)
+           p.mat = as.matrix(q_mat), insig = "pch",
+           sig.level = q_cut, pch.col = "black", pch.cex = 1)
   dev.off()
   return()
 }
