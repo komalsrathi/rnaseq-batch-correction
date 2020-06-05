@@ -83,6 +83,12 @@ The script will analyze all samples together into one co-occurrence plot, and it
 * Ganglioglioma
 * Craniopharyngioma
 
+#### Example Command
+
+```
+Rscript generate-interaction-plot.R --palette divergent_color_palette.tsv --q_cut_off 0.05 --p_cut_off 0.05 --include ./gene_lists/all_gene_list.tsv --metadata /data/pnoc003_histologies_v17_candidate.tsv --samples /data/pnoc003_wgs_samples.tsv --maf /data/pnoc003_wgs-consensus-open-pbta-merged.maf.gz --out /data/plot-out/p05-inc/pnoc003-wgs
+```
+
 #### Outputs
 
 The script outputs a series of plots and files used to generate the plots for each disease type above and for all diseases present in the metadata file. The output directory will have two sub-directories: "figures" which will contain the plots that are generated and "files" which will contain the intermediate files used to generate the plots. Each disease type will have the following files and plots:
