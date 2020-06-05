@@ -114,9 +114,6 @@ script_dir <- file.path(opts$scripts)
 palette_file <- file.path(opts$palette)
 p_cut <- opts$p_cut_off
 q_cut <- opts$q_cut_off
-print(meta_file)
-print(out_dir)
-print(script_dir)
 
 #load additional / helper functions
 source(file.path(script_dir, "cooccur_functions.R"))
