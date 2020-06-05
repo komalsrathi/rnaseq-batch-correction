@@ -91,3 +91,15 @@ The script outputs a series of plots and files used to generate the plots for ea
 * Co-occurrence plot: plot showing the pairwise co-occurrence of every mutated gene
 * Gene disease plot: a bar plot depicted the mutated genes and the number of samples with mutations in each gene.
 * Combined plot: both plots combined into a single figure.
+
+#### Key Functions
+
+The main analysis is carried out by helper functions found in the scripts subdirectory and controlled from the generate-interaction-plot.R script.
+
+The key functions are:
+
+* gene_counts() takes a maf file with mutations from samples being analyzed and uses dplyr functions to generate a count of genes with mutations for each sample in the maf file.
+* coocurrence() calculates the cooccurrence or mutual exclusivity of gene pairs and assigns each pair a significance value based on Fisher's exact test.
+* modify_cooc_sum() removes insignificant cooccurrence pairs based off a provided p value
+* plot_corr() uses the R corrplot library to graph the cooccurrence scores and label pairs with a hypothesis adjused value greater than a provided value
+* plot_disease() creates a bar plot with a count of mutations in each gene and disease type
