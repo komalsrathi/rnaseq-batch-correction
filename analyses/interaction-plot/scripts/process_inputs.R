@@ -1,4 +1,3 @@
-library(hash)
 library(dplyr)
 
 get_gene_list <- function(maf_df, exclude_file, disease_id) {

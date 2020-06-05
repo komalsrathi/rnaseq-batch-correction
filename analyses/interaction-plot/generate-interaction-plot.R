@@ -10,7 +10,6 @@
 # Load libraries:
 library(optparse)
 library(ggplot2)
-library(hash)
 library(patchwork)
 
 option_list <- list(
@@ -139,16 +138,8 @@ dir.create(figure_dir)
 dir.create(file_dir)
 
 #set up diseases
-diseases <- hash(
-"all" = "All",
-"Medulloblastoma" = "Medulloblastoma",
-"LGAT" = "Low-grade astrocytic tumor",
-"Ependymoma" = "Ependymoma",
-"HGAT" = "High-grade glioma",
-"DMG" = "Diffuse midline glioma",
-"Ganglioglioma" = "Ganglioglioma",
-"Craniopharyngioma" = "Craniopharyngioma"
-)
+diseases <- c("all",  "Medulloblastoma", "LGAT", "Ependymoma", "HGAT",
+  "DMG", "Ganglioglioma", "Craniopharyngioma")
 
 #determine which variant types to include
 include_types <- set_var_types(opts)
@@ -169,7 +160,7 @@ if (! is.null(opts$include)) {
 }
 
 #run analysis for each disease
-for (disease_id in keys(diseases)) {
+for (disease_id in diseases) {
   print(disease_id)
 
   #get the gene list
