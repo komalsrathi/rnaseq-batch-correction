@@ -66,7 +66,7 @@ Options:
 	* Kids_First_Biospecimen_ID
 	* Kids_First_Participant_ID
 	* short_histology
-* A tab separated file with fields "Kids_First_Biospecimen_ID" and	"Kids_First_Participant_I"
+* A tab separated file with fields "Kids_First_Biospecimen_ID" and	"Kids_First_Participant_ID"
 	* this will be the sample file
 * A file specifying the color palette to be used when generating the plots.
 * The path to a directory to write the output to.
