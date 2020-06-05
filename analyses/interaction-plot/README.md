@@ -95,6 +95,7 @@ The script outputs a series of plots and files used to generate the plots for ea
 * Gene Disease file: tab separated values file with a list of genes and count of samples with mutations in each gene.
 * Co-occurrence file: tab separated values file with a list of gene pairs and the co-occurrence score of each pair.
 * Co-occurrence plot: plot showing the pairwise co-occurrence of every mutated gene
+* Correlation plot: Co-occurrence plot: plot showing the pairwise co-occurrence of every mutated gene. This may replace the co-occurrence plot in future updates.
 * Gene disease plot: a bar plot depicted the mutated genes and the number of samples with mutations in each gene.
 * Combined plot: both plots combined into a single figure.
 
