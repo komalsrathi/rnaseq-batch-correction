@@ -17,7 +17,7 @@ option_list <- list(
     opt_str = "--metadata",
     type = "character",
     help = "File path to metadata file to be analyzed. Can be .gz compressed.",
-    metavar = "character"
+    metavar = "FILE"
   ),
   make_option(
     opt_str = "--outdir",
