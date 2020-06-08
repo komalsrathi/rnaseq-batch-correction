@@ -5,7 +5,7 @@ library(patchwork)
 library(corrplot)
 library(reshape2)
 
-plot_corr <- function(cooccur_df, corr_file, plot_size,
+plot_sort <- function(cooccur_df, corr_file, plot_size,
                       divergent_colors, na_color, q_cut) {
   #use corrplot to make an alternative plot
   temp_df <- data.frame(cooccur_df$label1, cooccur_df$label2,

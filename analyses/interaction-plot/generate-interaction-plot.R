@@ -214,10 +214,10 @@ for (disease_id in diseases) {
   #reduce cooccur summary to needed fields and generate labels
   coocur_df <- modify_cooc_sum(cooccur_sig)
 
-  #try out corrplot
-  corr_file <- file.path(figure_dir, paste("corr.", disease_id, ".png",
+  #plot coocccurrence using coorplot library
+  sorted_file <- file.path(figure_dir, paste("sorted.", disease_id, ".png",
     sep = ""))
-  corr_plot <- plot_corr(coocur_df, corr_file, plot_size,
+  sorted_plot <- plot_sort(coocur_df, corr_file, plot_size,
     divergent_colors, na_color, q_cut)
 
   #make cooccur_plot
