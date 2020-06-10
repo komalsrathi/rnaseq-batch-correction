@@ -26,7 +26,7 @@ import sys
 # This checks the packages to be installed if not already
 #   installed by user
 def install_package(package, package_list):
-    if not package in package_list:
+    if package not in package_list:
         print("Installing package " + package)
         pip._internal.main(["install", package])
 
