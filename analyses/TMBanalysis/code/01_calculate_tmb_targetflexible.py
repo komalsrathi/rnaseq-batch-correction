@@ -1,5 +1,5 @@
-##  This script takes MAF file and  metadata  file with experimental strategy  and
-#   target config file and computes TMB  scores for every samplename
+##  This script takes MAF file and  metadata  file with experimental strategy
+#   and target config file and computes TMB  scores for every samplename
 ####### Author: Teja Koganti ##################
 # Inputs  - 1. MAF file - Consensus should be performed prior to using as INputs
 #               Must follow the MAF format. It's okay  if the first
@@ -30,6 +30,33 @@ def install_package(package, package_list):
         print("Installing package " + package)
         pip._internal.main(["install", package])
 
+###################################################################
+############# Checking if all packages are installed ##############
+
+reqs = subprocess.check_output([sys.executable, "-m", "pip", "freeze"])
+installed_packages = [r.decode().split("==")[0] for r in reqs.split()]
+
+needed_packages = [
+    "pandas",
+    "numpy",
+    "pybedtools",
+]
+
+for package in needed_packages:
+    install_package(package, installed_packages)
+
+##################################################################
+
+
+# Importing packges
+# import modin.pandas as pd
+import pandas as pd
+import numpy as np
+import pybedtools
+import sys
+import pip
+
+
 
 # This function returns a dictionary where the keys are the experimental_strategy
 #   and the values are the BED files for those target exp_strategies
@@ -49,7 +76,8 @@ def get_target_dict(target_config):
 
 
 def calculate_tmb(
-    grouped_df, meta_data, target_dict, out, diseasecol, samplenamecol, targetcol
+    grouped_df, meta_data, target_dict, out, diseasecol, samplenamecol,
+        targetcol
 ):
     samplename = np.unique(grouped_df["Tumor_Sample_Barcode"])[0]
     meta_data = meta_data.set_index(samplenamecol)
@@ -57,9 +85,13 @@ def calculate_tmb(
     exp_strategy = meta_data.at[samplename, targetcol]
     disease = meta_data.at[samplename, diseasecol]
     if exp_strategy in target_dict.keys():
+        grouped_df["Start_Position"] = grouped_df.apply(
+            lambda x: x["Start_Position"] - 1, axis=1
+        )
         target_bed = target_dict.get(exp_strategy)
-        maf_within_target = pybedtools.BedTool.from_dataframe(grouped_df).intersect(
-            target_bed, u=True
+        maf_within_target = pybedtools.BedTool.from_dataframe(
+            grouped_df).intersect(
+                target_bed, u=True
         )
         mafdf_within_target = pybedtools.BedTool.to_dataframe(
             maf_within_target, names=cols
@@ -95,36 +127,12 @@ def calculate_bed_length(in_bed):
     return total_length
 
 
-###################################################################
-############# Checking if all packages are installed ##############
-
-reqs = subprocess.check_output([sys.executable, "-m", "pip", "freeze"])
-installed_packages = [r.decode().split("==")[0] for r in reqs.split()]
-
-needed_packages = [
-    "pandas",
-    "numpy",
-    "pybedtools",
-]
-
-for package in needed_packages:
-    install_package(package, installed_packages)
-
-##################################################################
-
-
-# Importing packges
-# import modin.pandas as pd
-import pandas as pd
-import numpy as np
-import pybedtools
-import sys
-import pip
+############### REading in input files #################################
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-i", "--maf", required=True, help="path to the MAF file")
-parser.add_argument(
-    "-m", "--metadatafile", required=True, help="path to the metadata/histology file"
+parser.add_argument("-m", "--metadatafile", required=True, help=
+    "path to the metadata/histology file"
 )
 parser.add_argument("-o", "--outfilename", required=True, help="Out file name")
 parser.add_argument(
@@ -141,6 +149,8 @@ parser.add_argument(
 )
 args = parser.parse_args()
 
+
+
 ################################################################
 # Defining MAF columns and metadata spcific fields from config #
 
@@ -149,21 +159,7 @@ needed_cols = [
     "Start_Position",
     "End_Position",
     "Variant_Classification",
-    "Variant_Type",
-    "Reference_Allele",
-    "Tumor_Seq_Allele1",
-    "Tumor_Seq_Allele2",
-    "dbSNP_RS",
     "Tumor_Sample_Barcode",
-    "Transcript_ID",
-    "t_depth",
-    "t_ref_count",
-    "t_alt_count",
-    "n_depth",
-    "n_ref_count",
-    "n_alt_count",
-    "Allele",
-    "flanking_bps",
 ]
 
 with open(args.configfile) as configlines:
@@ -172,11 +168,14 @@ with open(args.configfile) as configlines:
             stripped_line = line.strip("Variants_to_use_for_TMB=").rstrip("\n")
             var_class = stripped_line.split(",")
         if line.startswith("disease_column="):
-            disease_col = line.lstrip("disease_column").lstrip("=").rstrip("\n")
+            disease_col = line.lstrip("disease_column").lstrip(
+                "=").rstrip("\n")
         if line.startswith("samplename_column="):
-            samplename_col = line.lstrip("samplename_column").lstrip("=").rstrip("\n")
+            samplename_col = line.lstrip("samplename_column").lstrip(
+                "=").rstrip("\n")
         if line.startswith("typeoftargetcolumn="):
-            typeoftargetcol = line.lstrip("typeoftargetcolumn").lstrip("=").rstrip("\n")
+            typeoftargetcol = line.lstrip("typeoftargetcolumn").lstrip(
+                "=").rstrip("\n")
 
 ###########################################################
 
@@ -193,10 +192,6 @@ maf_file = maf_file.loc[
     maf_file.apply(lambda x: x["Variant_Classification"] in var_class, axis=1)
 ]
 
-# Calculating VAF  column
-maf_file["VAF"] = maf_file["t_alt_count"] / (
-    maf_file["t_ref_count"] + maf_file["t_alt_count"]
-)
 ###########################################################
 
 
@@ -207,7 +202,8 @@ target_dict = get_target_dict(args.targetconfig)
 
 ############  Groupby and calculate TMB #####################
 outfile = open(args.outfilename, "w")
-outfile.write("Samplename\texperimental_strategy\tdisease\tcount\tbedlength\tTMB\n")
+outfile.write(
+    "Samplename\texperimental_strategy\tdisease\tcount\tbedlength\tTMB\n")
 metadata_df = pd.read_csv(args.metadatafile, sep="\t")
 grouped_maf = maf_file.groupby("Tumor_Sample_Barcode")
 line = grouped_maf.apply(

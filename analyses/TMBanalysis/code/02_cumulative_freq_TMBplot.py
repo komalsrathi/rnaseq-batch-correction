@@ -48,6 +48,7 @@ for package in needed_packages:
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import pip
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-t", "--tmb_scores", required=True, help="file with TMB scores")
