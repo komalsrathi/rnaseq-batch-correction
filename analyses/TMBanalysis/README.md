@@ -36,9 +36,11 @@ It takes a single MAF file and filters variants  based filtering strategies from
                            calculate_tmb.cfg.txt file with columns for disease,
                            samplename, variant types etc.  
 
-   `Input`  :
+   `Inputs`  :
       1. cohort based MAF files [here](https://s3.console.aws.amazon.com/s3/buckets/d3b-bix-dev-data-bucket/hgg-dmg-integration/openPBTA-consensus/?region=us-east-1&tab=overview)
-      2. config file for target  and calculating TMB  ![here](output/pbta-snv-mutect2.CFD.TMB.png)
+
+      2. config file for target  and calculating TMB  ![here](inputs)
+
       3. Histology files for metadata  [here](https://github.com/d3b-center/d3b-bix-analysis-toolkit/tree/master/data/histologies)
 
    `Output` :
