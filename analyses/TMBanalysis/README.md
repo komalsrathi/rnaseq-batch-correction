@@ -37,11 +37,12 @@ It takes a single MAF file and filters variants  based filtering strategies from
                            samplename, variant types etc.  
 
    `Inputs`  :
-      1. cohort based MAF files [here](https://s3.console.aws.amazon.com/s3/buckets/d3b-bix-dev-data-bucket/hgg-dmg-integration/openPBTA-consensus/?region=us-east-1&tab=overview)
 
-      2. config file for target  and calculating TMB  ![here](inputs)
+    1. cohort based MAF files [here](https://s3.console.aws.amazon.com/s3/buckets/d3b-bix-dev-data-bucket/hgg-dmg-integration/openPBTA-consensus/?region=us-east-1&tab=overview)
 
-      3. Histology files for metadata  [here](https://github.com/d3b-center/d3b-bix-analysis-toolkit/tree/master/data/histologies)
+    2. config file for target  and calculating TMB  ![here](inputs)
+
+    3. Histology files for metadata  [here](https://github.com/d3b-center/d3b-bix-analysis-toolkit/tree/master/data/histologies)
 
    `Output` :
    - [output/output/pbta-snv-consensus-mutation_tmb.txt](https://github.com/d3b-center/d3b-bix-analysis-toolkit/blob/feature/tmb_code/analyses/TMBanalysis/output/pbta-snv-consensus-mutation_tmb.txt)
