@@ -8,6 +8,7 @@ suppressPackageStartupMessages(library(reshape2))
 
 # root directory
 root_dir <- rprojroot::find_root(rprojroot::has_dir(".git"))
+source(file.path(root_dir, "analyses", "rnaseq-batch-correct", "util", "install_pkgs.R"))
 outdir <- file.path(root_dir, "analyses", "rnaseq-batch-correct", "input/")
 
 # parameters

@@ -6,6 +6,7 @@
 # load libraries
 suppressPackageStartupMessages(library(grid))
 suppressPackageStartupMessages(library(ggthemes))
+suppressPackageStartupMessages(library(scales))
 
 theme_Publication <- function(base_size=12, base_family="Helvetica") {
   (theme_foundation(base_size=base_size, base_family=base_family)
@@ -35,20 +36,14 @@ theme_Publication <- function(base_size=12, base_family="Helvetica") {
 }
 
 scale_fill_Publication <- function(...){
-  library(scales)
   discrete_scale("fill","Publication",manual_pal(values = c("#386cb0","#fdb462","#7fc97f","#ef3b2c","#662506","#a6cee3","#fb9a99","#984ea3","#ffff33")), ...)
-  
 }
 
 scale_colour_Publication <- function(...){
-  library(scales)
   discrete_scale("colour","Publication",manual_pal(values = c("#386cb0","#fdb462","#7fc97f","#ef3b2c","#662506","#a6cee3","#fb9a99","#984ea3","#ffff33")), ...)
-  
 }
 
 theme_Publication2 <- function(base_size=12, base_family="Helvetica") {
-  library(grid)
-  library(ggthemes)
   (theme_foundation(base_size=base_size, base_family=base_family)
     + theme(plot.title = element_text(size = rel(1.2), hjust = 0.5),
             text = element_text(),
@@ -67,5 +62,4 @@ theme_Publication2 <- function(base_size=12, base_family="Helvetica") {
             strip.background=element_rect(colour="#f0f0f0",fill="#f0f0f0"),
             strip.text = element_text(face="bold")
     ))
-  
 }

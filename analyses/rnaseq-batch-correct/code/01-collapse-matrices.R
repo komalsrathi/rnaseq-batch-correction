@@ -7,6 +7,7 @@ suppressPackageStartupMessages(library(tidyverse))
 
 # root directory
 root_dir <- rprojroot::find_root(rprojroot::has_dir(".git"))
+source(file.path(root_dir, "analyses", "rnaseq-batch-correct", "util", "install_pkgs.R"))
 source(file.path(root_dir, "analyses", "rnaseq-batch-correct", "util", "collapse_rnaseq.R"))
 outdir <- file.path(root_dir, "analyses", "rnaseq-batch-correct", "output/")
 
