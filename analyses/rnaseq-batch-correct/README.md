@@ -293,6 +293,9 @@ pnoc003-cohort1-gtex-tgen-gene-expression-rsem-tpm.rds
 # PNOC003 Cohort 3a + GTEx Normal Brain + TGEN Brain : 
 pnoc003-cohort3a-gtex-tgen-gene-expression-rsem-tpm.rds
 
+# PNOC003 Cohort 3a (no PNOC008) + GTEx Normal Brain + TGEN Brain :
+pnoc003-cohort3a-wo-PNOC008-gtex-tgen-gene-expression-rsem-tpm.rds
+
 # PNOC003 Cohort 3b + GTEx Normal Brain + TGEN Brain : 
 pnoc003-cohort3b-gtex-tgen-gene-expression-rsem-tpm.rds
 ```
@@ -305,6 +308,9 @@ pnoc003-cohort1-gtex-tgen-gene-expression-rsem-tpm-corrected.rds
 
 # PNOC003 Cohort 3a + GTEx Normal Brain + TGEN Brain : 
 pnoc003-cohort3a-gtex-tgen-gene-expression-rsem-tpm-corrected.rds
+
+# PNOC003 Cohort 3a (no PNOC008) + GTEx Normal Brain + TGEN Brain : 
+pnoc003-cohort3a-wo-PNOC008-gtex-tgen-gene-expression-rsem-tpm-corrected.rds
 
 # PNOC003 Cohort 3b + GTEx Normal Brain + TGEN Brain : 
 pnoc003-cohort3b-gtex-tgen-gene-expression-rsem-tpm-corrected.rds
