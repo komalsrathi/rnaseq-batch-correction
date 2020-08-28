@@ -298,6 +298,9 @@ pnoc003-cohort3a-wo-PNOC008-gtex-tgen-gene-expression-rsem-tpm.rds
 
 # PNOC003 Cohort 3b + GTEx Normal Brain + TGEN Brain : 
 pnoc003-cohort3b-gtex-tgen-gene-expression-rsem-tpm.rds
+
+# PNOC003 Cohort 3b (no PNOC008) + GTEx Normal Brain + TGEN Brain : 
+pnoc003-cohort3b-wo-PNOC008-gtex-tgen-gene-expression-rsem-tpm.rds
 ```
 
 Example corrected matrices:
@@ -314,4 +317,7 @@ pnoc003-cohort3a-wo-PNOC008-gtex-tgen-gene-expression-rsem-tpm-corrected.rds
 
 # PNOC003 Cohort 3b + GTEx Normal Brain + TGEN Brain : 
 pnoc003-cohort3b-gtex-tgen-gene-expression-rsem-tpm-corrected.rds
+
+# PNOC003 Cohort 3b (no PNOC008) + GTEx Normal Brain + TGEN Brain : 
+pnoc003-cohort3b-wo-PNOC008-gtex-tgen-gene-expression-rsem-tpm-corrected.rds
 ```
