@@ -20,7 +20,9 @@ option_list <- list(
   make_option(c("--corrected_mat"), type = "character",
               help = "Corrected expression matrix with multiple batches (RSEM TPM) (.rds)"),
   make_option(c("--combined_clin"), type = "character",
-              help = "Combined clinical file with multiple batches (.rds)"),
+              help = "Combined clinical file with multiple batches (.tsv)"),
+  make_option(c("--sample_id"), type = "character",
+              help = "Sample identifier column in clinical file matching column names in expression datasets"),
   make_option(c("--tsne_plots"), type = "character",
               help = "Summary clustering plots (.pdf)"),
   make_option(c("--density_plots"), type = "character",
@@ -31,6 +33,7 @@ opt <- parse_args(OptionParser(option_list = option_list))
 uncorrected_mat <- opt$uncorrected_mat
 corrected_mat <- opt$corrected_mat
 combined_clin <- opt$combined_clin
+sample_id <- opt$sample_id
 tsne_plots <- opt$tsne_plots
 tsne_plots <- file.path(plotdir, tsne_plots)
 density_plots <- opt$density_plots
@@ -39,7 +42,10 @@ density_plots <- file.path(plotdir, density_plots)
 # read input data
 uncorrected_mat <- readRDS(uncorrected_mat)
 corrected_mat <- readRDS(corrected_mat)
-combined_clin <- readRDS(combined_clin)
+combined_clin <- read.delim(combined_clin, stringsAsFactors = F, check.names = F)
+combined_clin <- combined_clin %>%
+  mutate(tmp = get(sample_id)) %>%
+  column_to_rownames('tmp')
 
 # arrange with clinical file
 uncorrected_mat <- uncorrected_mat[,rownames(combined_clin)]
@@ -70,8 +76,8 @@ ggarrange(p, q, r, s, common.legend = T) %>%
 # uncorrected  mat
 uncorrected_mat.hk <- uncorrected_mat.hk %>% 
   rownames_to_column('gene') %>% 
-  gather(-gene, key ="sample_id", value = 'value') %>%
-  inner_join(combined_clin, by = "sample_id")
+  gather(-gene, key = !!sample_id, value = 'value') %>%
+  inner_join(combined_clin, by = sample_id)
 p <- density.plot(mat = uncorrected_mat.hk, 
                var = 'batch', 
                title = 'House Keeping Genes (Before ComBat correction)',
@@ -81,8 +87,8 @@ p <- density.plot(mat = uncorrected_mat.hk,
 corrected_mat.hk <- corrected_mat.hk %>% 
   as.data.frame() %>%
   rownames_to_column('gene') %>% 
-  gather(-gene, key ="sample_id", value = 'value') %>%
-  inner_join(combined_clin, by = "sample_id")
+  gather(-gene, key = !!sample_id, value = 'value') %>%
+  inner_join(combined_clin, by = sample_id)
 q <- density.plot(mat = corrected_mat.hk, 
                var = 'batch', 
                title = 'House Keeping Genes (After ComBat correction)',
