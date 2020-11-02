@@ -17,7 +17,7 @@ Addresses issues:
 .
 ├── README.md
 ├── code
-│   ├── 00-data-prep.R			# script to merge RSEM files (if applicable)
+│   ├── 00-merge-rsem.R			# script to merge RSEM files (if applicable)
 │   ├── 01-collapse-matrices.R	# script to uniquify RSEM TPM into gene symbols and sample matrix 
 │   ├── 02-combine-matrices.R	# script to combine multiple datasets
 │   ├── 02-create-clin.R		# script to create clinical file for each dataset to combine
@@ -25,8 +25,8 @@ Addresses issues:
 │   ├── 04-batch-correct.R		# script to batch correct combined TPM matrices
 │   ├── 05-qc-plots.R			# script to create t-SNE and density plots
 ├── output
-│   ├── *-corrected.rds			# combined matrices for batch corrected datasets
-	├── *-metadata.rds			# combined clinical file for batch corrected datasets
+│   ├── *-corrected.rds			# matrices for batch corrected datasets
+│   ├── *-uncorrected.rds		# matrices for uncorrected datasets
 ├── plots
 │   ├── *-density.pdf			# density plots before and after batch correction
 │   └── *-tsne.pdf				# t-SNE plots before and after batch correction
@@ -34,25 +34,26 @@ Addresses issues:
 └── util
     ├── collapse_rnaseq.R		# function to collapse matrices by uniquifying gene symbols
     ├── density_plots.R			# function to create density plots
+    ├── install_pkgs.R			# function to install required packages
     ├── pubTheme.R				# function for publication quality ggplot2 theme
     └── tsne_plots.R			# function to create t-SNE plots
 ```
 
 ### Analysis scripts
 
-#### code/00-data-prep.R
+#### code/00-merge-rsem.R
 
 This script merges all RSEM files into a matrix of gene_id and sample names.
 
 ```sh
-Rscript code/00-data-prep.R --help
+Rscript code/00-merge-rsem.R --help
 
 Options:
 	--rsem_path=RSEM_PATH
 		Path to all RSEM genes.results files
 
 	--outfile=OUTFILE
-		Output filename (.RDS)
+		Output filename (.rds)
 
 	-h, --help
 		Show this help message and exit
@@ -61,7 +62,7 @@ Options:
 ##### Example Run
 
 ```sh
-Rscript code/00-data-prep.R \
+Rscript code/00-merge-rsem.R \
 --rsem_path input/TGEN_normals \
 --outfile tgen-normals-gene-expression-rsem-tpm.polya.rds
 ```
@@ -75,13 +76,13 @@ Rscript code/01-collapse-matrices.R --help
 
 Options:
 	--mat=MAT
-		Expression Matrix (RSEM TPM) (.RDS)
+		Expression Matrix (RSEM TPM) (.rds)
 
 	--gene_sym=GENE_SYM
 		Is gene symbol present?
 
 	--outfile=OUTFILE
-		Output filename (.RDS)
+		Output filename (.rds)
 
 	-h, --help
 		Show this help message and exit
@@ -105,51 +106,7 @@ Rscript code/02-combine-matrices.R --help
 
 Options:
 	--matrices=MATRICES
-		Comma separated list of expression matrices to combine (RSEM TPM) (.RDS)
-
-	--outfile=OUTFILE
-		Output filename (.RDS)
-
-	-h, --help
-		Show this help message and exit
-```
-
-##### Example Run
-
-```sh
-Rscript code/02-combine-matrices.R \
---matrices "output/pnoc003_subset_Diagnosis-gene-expression-rsem-tpm.collapsed.polya.rds, output/gtex-brain-normals-gene-expression-rsem-tpm.collapsed.polya.rds, output
---outfile pnoc003-cohort1-gtex-tgen-gene-expression-rsem-tpm.rds
-```
-
-#### code/02-create-clin.R
-
-This script will create a clinical or metadata file for each input matrix. If an existing clinical file is used, then it requires the following parameters to be set: `--clin`, `--id_col`, `--lib_col` and `--study_col`. If you don't have any existing clinical file, then use `--lib` and `--study` columns to manually specify the library type and study identifier for the dataset.
-
-```sh
-Rscript code/02-create-clin.R --help
-
-Options:
-	--mat=MAT
-		Expression Matrix (RSEM TPM) (.rds)
-
-	--clin=CLIN
-		Existing clinical file (.rds)
-
-	--id_col=ID_COL
-		Sample identifier column to be used (only use with --clin option)
-
-	--lib_col=LIB_COL
-		Library column to be used (only use with --clin option)
-
-	--study_col=STUDY_COL
-		Study column to be used (only use with --clin option)
-
-	--lib=LIB
-		Library Prep Method
-
-	--study=STUDY
-		Study identifier
+		Comma separated list of expression matrices to combine (RSEM TPM) (.rds)
 
 	--outfile=OUTFILE
 		Output filename (.rds)
@@ -161,21 +118,61 @@ Options:
 ##### Example Run
 
 ```sh
-# when clinical file is available
-Rscript code/02-create-clin.R \
---mat output/cohort3a_subset-gene-expression-rsem-tpm.collapsed.polya.rds \
---clin input/hgat_all_primary.rds \
---id_col 'Kids_First_Biospecimen_ID' \
---lib_col 'library' \
---study_col 'cohort' \
---outfile pnoc003-cohort3a-polya-batch-metadata.rds
+Rscript code/02-combine-matrices.R \
+--matrices "input/pbta-gene-expression-rsem-tpm-collapsed.stranded.rds, input/pbta-gene-expression-rsem-tpm-collapsed.polya.rds" \
+--outfile pbta-gene-expression-rsem-tpm-collapsed.combined.rds
+```
 
-# when clinical file is not available
+#### code/02-create-clin.R
+
+This script will create a clinical or metadata file for each input matrix. If an existing clinical file is used, then it requires the following parameters to be set: `--clin`, `--id_col`, `--lib_col` and `--study_col`. If you don't have any existing clinical file, then use `--mat`, `--lib` and `--study` columns to manually specify the sample ids, library type and study identifier for the dataset.
+
+```sh
+Rscript code/02-create-clin.R --help
+
+Options:
+	--clin=CLIN
+		Existing clinical file (.tsv)
+
+	--cohort_col=COHORT_COL
+		cohort column to be used for subsetting clinical file
+
+	--id_col=ID_COL
+		Sample identifier column to be used (only use with --clin option)
+
+	--lib_col=LIB_COL
+		Library column to be used (only use with --clin option)
+
+	--study_col=STUDY_COL
+		Study column to be used (only use with --clin option)
+
+	--mat=MAT
+		Expression Matrix (RSEM TPM) (.rds) (when --clin is not provided)
+
+	--lib=LIB
+		Library prep method for all samples (when --clin is not provided)
+
+	--study=STUDY
+		Study identifier for all samples (when --clin is not provided)
+
+	--outfile=OUTFILE
+		Output filename (.tsv)
+
+	-h, --help
+		Show this help message and exit
+
+```
+
+##### Example Run
+
+```sh
 Rscript code/02-create-clin.R \
---mat output/gtex-brain-normals-gene-expression-rsem-tpm.collapsed.polya.rds \
---lib polyA \
---study GTEx \
---outfile gtex-batch-metadata.rds
+--clin input/pbta-histologies.tsv \
+--cohort_col pbta-hgat-dx \
+--id_col Kids_First_Biospecimen_ID \
+--lib_col RNA_library \
+--study_col cohort \
+--outfile pbta-hgat-dx_histology_annotation.tsv
 ```
 
 #### code/03-combine-clin.R
@@ -187,10 +184,10 @@ Rscript code/03-combine-clin.R --help
 
 Options:
 	--clin=CLIN
-		Comma separated list of metadata to combine (.RDS)
+		Comma separated list of metadata to combine (.tsv)
 
 	--outfile=OUTFILE
-		Output filename (.RDS)
+		Output filename (.tsv)
 
 	-h, --help
 		Show this help message and exit
@@ -200,8 +197,8 @@ Options:
 
 ```sh
 Rscript code/03-combine-clin.R \
---clin 'input/pnoc003-cohort1-batch-metadata.rds, input/gtex-batch-metadata.rds, input/tgen-batch-metadata.rds' \
---outfile pnoc003-cohort1-gtex-tgen-metadata.rds
+--clin 'input/pnoc003-cohort1-batch-metadata.tsv, input/gtex-batch-metadata.tsv, input/tgen-batch-metadata.tsv' \
+--outfile pnoc003-cohort1-gtex-tgen-metadata.tsv
 ```
 
 #### code/04-batch-correct.R
@@ -213,10 +210,36 @@ Script to batch correct combined input dataset generated using code/02-combine-m
 ```sh
 Rscript code/04-batch-correct.R --help
 
+Options:
+	--combined_mat=COMBINED_MAT
+		Combined expression matrix with multiple batches (RSEM TPM) (.rds)
+
+	--combined_clin=COMBINED_CLIN
+		Combined clinical file with multiple batches (.rds)
+
+	--sample_id=SAMPLE_ID
+		Sample identifiers matching between clinical and expression matrix
+
+	--corrected_outfile=CORRECTED_OUTFILE
+		Output filename (.RDS)
+
+	--uncorrected_outfile=UNCORRECTED_OUTFILE
+		Output filename (.RDS)
+
+	-h, --help
+		Show this help message and exit
+```
+
+##### Example Run
+
+```sh
 Rscript code/04-batch-correct.R \
---combined_mat output/pnoc003-cohort1-gtex-tgen-gene-expression-rsem-tpm.rds \
---combined_clin output/pnoc003-cohort1-gtex-tgen-metadata.rds \
---outfile pnoc003-cohort1-gtex-tgen-gene-expression-rsem-tpm-corrected.rds
+--combined_mat output/pbta-gene-expression-rsem-tpm-collapsed.combined.rds \
+--combined_clin input/pbta-hgat-dx_histology_annotation.tsv \
+--sample_id Kids_First_Biospecimen_ID \
+--corrected_outfile pbta-hgat-dx-gene-expression-rsem-tpm-corrected.rds \
+--uncorrected_outfile pbta-hgat-dx-gene-expression-rsem-tpm-uncorrected.rds
+
 ```
 
 #### code/05-qc-plots.R
@@ -234,7 +257,10 @@ Options:
 		Corrected expression matrix with multiple batches (RSEM TPM) (.rds)
 
 	--combined_clin=COMBINED_CLIN
-		Combined clinical file with multiple batches (.rds)
+		Combined clinical file with multiple batches (.tsv)
+
+	--sample_id=SAMPLE_ID
+		Sample identifier column in clinical file matching column names in expression datasets
 
 	--tsne_plots=TSNE_PLOTS
 		Summary clustering plots (.pdf)
@@ -250,25 +276,19 @@ Options:
 
 ```sh
 Rscript code/05-qc-plots.R \
---uncorrected_mat output/pnoc003-cohort1-gtex-tgen-gene-expression-rsem-tpm.rds \
---corrected_mat output/pnoc003-cohort1-gtex-tgen-gene-expression-rsem-tpm-corrected.rds \
---combined_clin output/pnoc003-cohort1-gtex-tgen-metadata.rds \
---tsne_plots pnoc003-cohort1-gtex-tgen-tsne.pdf \
---density_plots pnoc003-cohort1-gtex-tgen-density.pdf
+--uncorrected_mat output/pbta-gene-expression-rsem-tpm-collapsed.combined.rds \
+--corrected_mat output/pbta-hgat-dx-gene-expression-rsem-tpm-corrected.rds \
+--combined_clin input/pbta-hgat-dx_histology_annotation.tsv \
+--sample_id "Kids_First_Biospecimen_ID" \
+--tsne_plots pbta-hgat-dx-tpm-tsne.pdf \
+--density_plots pbta-hgat-dx-tpm-density.pdf
 ```
 
 ### Running the full analysis
 
 ```sh
-# Use any of the following scripts as a template to run the full analysis
-# PNOC003 Cohort 1 + GTEx Brain + TGEN Brain
-bash run_cohort1_analysis.sh
-
-# PNOC003 Cohort 3a + GTEx Brain + TGEN Brain
-bash run_cohort3a_analysis.sh
-
-# PNOC003 Cohort 3b + GTEx Brain + TGEN Brain
-bash run_cohort3b_analysis.sh
+# pbta-hgat-dx analysis
+bash pbta-hgat-dx-analysis.sh
 ```
 
 #### Output data
@@ -277,47 +297,6 @@ All combined uncorrected and corrected matrices, combined clinical files and qc 
 
 ```sh
 # s3 location:
-s3://d3b-bix-dev-data-bucket/hgg-dmg-integration/batch_correction/
-
-# command used
-aws s3 --profile saml sync output/ s3://d3b-bix-dev-data-bucket/hgg-dmg-integration/batch_correction/ --include "*.rds"
-aws s3 --profile saml sync plots/ s3://d3b-bix-dev-data-bucket/hgg-dmg-integration/batch_correction/ --include "*.pdf"
+s3://d3b-bix-dev-data-bucket/hgg-dmg-integration/merged_ngs_files/rna-seq/batch-corrected
 ```
 
-Example uncorrected matrices:
-
-```sh
-# PNOC003 Cohort 1 + GTEx Normal Brain + TGEN Brain : 
-pnoc003-cohort1-gtex-tgen-gene-expression-rsem-tpm.rds
-
-# PNOC003 Cohort 3a + GTEx Normal Brain + TGEN Brain : 
-pnoc003-cohort3a-gtex-tgen-gene-expression-rsem-tpm.rds
-
-# PNOC003 Cohort 3a (no PNOC008) + GTEx Normal Brain + TGEN Brain :
-pnoc003-cohort3a-wo-PNOC008-gtex-tgen-gene-expression-rsem-tpm.rds
-
-# PNOC003 Cohort 3b + GTEx Normal Brain + TGEN Brain : 
-pnoc003-cohort3b-gtex-tgen-gene-expression-rsem-tpm.rds
-
-# PNOC003 Cohort 3b (no PNOC008) + GTEx Normal Brain + TGEN Brain : 
-pnoc003-cohort3b-wo-PNOC008-gtex-tgen-gene-expression-rsem-tpm.rds
-```
-
-Example corrected matrices:
-
-```sh
-# PNOC003 Cohort 1 + GTEx Normal Brain + TGEN Brain: 
-pnoc003-cohort1-gtex-tgen-gene-expression-rsem-tpm-corrected.rds
-
-# PNOC003 Cohort 3a + GTEx Normal Brain + TGEN Brain : 
-pnoc003-cohort3a-gtex-tgen-gene-expression-rsem-tpm-corrected.rds
-
-# PNOC003 Cohort 3a (no PNOC008) + GTEx Normal Brain + TGEN Brain : 
-pnoc003-cohort3a-wo-PNOC008-gtex-tgen-gene-expression-rsem-tpm-corrected.rds
-
-# PNOC003 Cohort 3b + GTEx Normal Brain + TGEN Brain : 
-pnoc003-cohort3b-gtex-tgen-gene-expression-rsem-tpm-corrected.rds
-
-# PNOC003 Cohort 3b (no PNOC008) + GTEx Normal Brain + TGEN Brain : 
-pnoc003-cohort3b-wo-PNOC008-gtex-tgen-gene-expression-rsem-tpm-corrected.rds
-```
