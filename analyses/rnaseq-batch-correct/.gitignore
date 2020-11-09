@@ -1,4 +1,5 @@
-input/*
+input/
 Rplots.pdf
 code/format_cohort3_clinfiles.R
-output/*
+output/
+Archive/

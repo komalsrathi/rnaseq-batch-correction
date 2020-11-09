@@ -38,7 +38,7 @@ Rscript code/04-batch-correct.R \
 # step4: qc plots 
 # corrected tpm matrices
 Rscript code/05-qc-plots.R \
---uncorrected_mat output/pbta-gene-expression-rsem-tpm-collapsed.combined.rds \
+--uncorrected_mat output/pbta-hgat-dx-gene-expression-rsem-tpm-uncorrected.rds \
 --corrected_mat output/pbta-hgat-dx-gene-expression-rsem-tpm-corrected.rds \
 --combined_clin input/pbta-hgat-dx_histology_annotation.tsv \
 --sample_id "Kids_First_Biospecimen_ID" \
@@ -47,7 +47,7 @@ Rscript code/05-qc-plots.R \
 
 # corrected fpkm matrices
 Rscript code/05-qc-plots.R \
---uncorrected_mat output/pbta-gene-expression-rsem-fpkm-collapsed.combined.rds \
+--uncorrected_mat output/pbta-hgat-dx-gene-expression-rsem-fpkm-uncorrected.rds \
 --corrected_mat output/pbta-hgat-dx-gene-expression-rsem-fpkm-corrected.rds \
 --combined_clin input/pbta-hgat-dx_histology_annotation.tsv \
 --sample_id "Kids_First_Biospecimen_ID" \

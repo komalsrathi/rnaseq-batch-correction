@@ -71,10 +71,10 @@ if(!is.na(clin) & !is.na(id_col) & !is.na(lib_col) & !is.na(study_col) &
 if(dummy == 'denovo_clinical'){
   # read expression matrix
   mat <- readRDS(mat)
-  clin <- data.frame(sample_id = colnames(mat), study_id = study, library = library_prep)
+  clin <- data.frame(identifier = colnames(mat), study_id = study, library = library_prep)
   clin <- clin %>%
     mutate(batch = paste0(study_id, '_', library)) %>%
-    dplyr::select(sample_id, batch)
+    dplyr::select(identifier, batch)
 }
 
 # create clinical file using existing clinical file
@@ -87,8 +87,9 @@ if(dummy == 'existing_clinical'){
   }
   clin <- clin %>%
     filter(experimental_strategy == 'RNA-Seq') %>%
-    mutate(batch = paste0(get(study_col), '_', get(lib_col))) %>%
-    dplyr::select(id_col, batch)
+    mutate(batch = paste0(get(study_col), '_', get(lib_col)),
+           identifier = get(id_col)) %>%
+    dplyr::select(identifier, batch)
 }
 
 # save output

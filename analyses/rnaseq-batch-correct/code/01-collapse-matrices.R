@@ -14,18 +14,17 @@ outdir <- file.path(root_dir, "analyses", "rnaseq-batch-correct", "output/")
 # parameters
 option_list <- list(
   make_option(c("--mat"), type = "character",
-              help = "Expression Matrix (RSEM TPM) (.RDS)"),
+              help = "Expression Matrix (RSEM TPM or FPKM) (.rds)"),
   make_option(c("--gene_sym"),  type = "logical",
               help = "Is gene symbol present?"),
   make_option(c("--outfile"), type = "character",
-              help = "Output filename (.RDS)"))
+              help = "Output filename (.rds)"))
 
 # parse parameters
 opt <- parse_args(OptionParser(option_list = option_list))
 mat <- opt$mat
 gene_sym <- opt$gene_sym
 outfile <- opt$outfile
-outfile <- file.path(outdir, outfile)
 
 # read data
 mat <- readRDS(mat)
