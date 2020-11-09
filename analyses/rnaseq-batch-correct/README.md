@@ -43,7 +43,7 @@ Addresses issues:
 
 #### code/00-merge-rsem.R
 
-This script merges all RSEM files into a matrix of gene_id and sample names.
+This script merges all RSEM files into a matrix of gene_id and sample names. Specify --type to create a matrix of FPKM or TPM.
 
 ```sh
 Rscript code/00-merge-rsem.R --help
@@ -52,8 +52,11 @@ Options:
 	--rsem_path=RSEM_PATH
 		Path to all RSEM genes.results files
 
+	--type=TYPE
+		TPM or FPKM
+
 	--outfile=OUTFILE
-		Output filename (.rds)
+		Output filename (.RDS)
 
 	-h, --help
 		Show this help message and exit
@@ -63,8 +66,9 @@ Options:
 
 ```sh
 Rscript code/00-merge-rsem.R \
---rsem_path input/TGEN_normals \
---outfile tgen-normals-gene-expression-rsem-tpm.polya.rds
+--rsem_path "input/TGEN_normals" \
+--type "TPM" \
+--outfile "input/tgen-brain-normals-gene-expression-rsem-tpm.polya.rds"
 ```
 
 #### code/01-collapse-matrices.R
@@ -92,9 +96,9 @@ Options:
 
 ```sh
 Rscript code/01-collapse-matrices.R \
---mat input/tgen-normals-gene-expression-rsem-tpm.polya.rds \
---gene_sym FALSE \
---outfile tgen-brain-normals-gene-expression-rsem-tpm.collapsed.polya.rds
+--mat "input/tgen-brain-normals-gene-expression-rsem-tpm.polya.rds"  \
+--gene_sym "FALSE" \
+--outfile "input/tgen-brain-normals-gene-expression-rsem-tpm.collapsed.polya.rds"
 ```
 
 #### code/02-combine-matrices.R
@@ -119,8 +123,8 @@ Options:
 
 ```sh
 Rscript code/02-combine-matrices.R \
---matrices "input/pbta-gene-expression-rsem-tpm-collapsed.stranded.rds, input/pbta-gene-expression-rsem-tpm-collapsed.polya.rds" \
---outfile pbta-gene-expression-rsem-tpm-collapsed.combined.rds
+--matrices "input/pbta-gene-expression-rsem-tpm-collapsed.stranded.rds, input/pbta-gene-expression-rsem-tpm-collapsed.polya.rds, input/tgen-brain-normals-gene-expression-rsem-tpm.collapsed.polya.rds, input/gtex-brain-normals-gene-expression-rsem-tpm.collapsed.polya.rds" \
+--outfile "pbta-tgen-gtex-gene-expression-rsem-tpm-collapsed.combined.rds"
 ```
 
 #### code/02-create-clin.R
@@ -167,12 +171,12 @@ Options:
 
 ```sh
 Rscript code/02-create-clin.R \
---clin input/pbta-histologies.tsv \
---cohort_col pbta-hgat-dx \
---id_col Kids_First_Biospecimen_ID \
---lib_col RNA_library \
---study_col cohort \
---outfile pbta-hgat-dx_histology_annotation.tsv
+--clin "input/pbta-histologies.tsv" \
+--cohort_col "pbta-hgat-dx-prog-pm" \
+--id_col "Kids_First_Biospecimen_ID" \
+--lib_col "RNA_library" \
+--study_col "cohort" \
+--outfile "pbta-hgat-dx-prog-pm_histology_annotation.tsv"
 ```
 
 #### code/03-combine-clin.R
@@ -197,8 +201,8 @@ Options:
 
 ```sh
 Rscript code/03-combine-clin.R \
---clin 'input/pnoc003-cohort1-batch-metadata.tsv, input/gtex-batch-metadata.tsv, input/tgen-batch-metadata.tsv' \
---outfile pnoc003-cohort1-gtex-tgen-metadata.tsv
+--clin "input/pbta-hgat-dx-prog-pm_histology_annotation.tsv, input/tgen-batch-metadata.tsv, input/gtex-batch-metadata.tsv" \
+--outfile "pbta-hgat-dx-prog-pm-tgen-gtex-combined-clin.tsv"
 ```
 
 #### code/04-batch-correct.R
@@ -234,12 +238,11 @@ Options:
 
 ```sh
 Rscript code/04-batch-correct.R \
---combined_mat output/pbta-gene-expression-rsem-tpm-collapsed.combined.rds \
---combined_clin input/pbta-hgat-dx_histology_annotation.tsv \
---sample_id Kids_First_Biospecimen_ID \
---corrected_outfile pbta-hgat-dx-gene-expression-rsem-tpm-corrected.rds \
---uncorrected_outfile pbta-hgat-dx-gene-expression-rsem-tpm-uncorrected.rds
-
+--combined_mat "output/pbta-tgen-gtex-gene-expression-rsem-tpm-collapsed.combined.rds" \
+--combined_clin "output/pbta-hgat-dx-prog-pm-tgen-gtex-combined-clin.tsv" \
+--sample_id "identifier" \
+--corrected_outfile "pbta-hgat-dx-prog-pm-tgen-gtex-gene-expression-rsem-tpm-corrected.rds" \
+--uncorrected_outfile "pbta-hgat-dx-prog-pm-tgen-gtex-gene-expression-rsem-tpm-uncorrected.rds"
 ```
 
 #### code/05-qc-plots.R
@@ -276,27 +279,27 @@ Options:
 
 ```sh
 Rscript code/05-qc-plots.R \
---uncorrected_mat output/pbta-gene-expression-rsem-tpm-collapsed.combined.rds \
---corrected_mat output/pbta-hgat-dx-gene-expression-rsem-tpm-corrected.rds \
---combined_clin input/pbta-hgat-dx_histology_annotation.tsv \
---sample_id "Kids_First_Biospecimen_ID" \
---tsne_plots pbta-hgat-dx-tpm-tsne.pdf \
---density_plots pbta-hgat-dx-tpm-density.pdf
+--uncorrected_mat "output/pbta-hgat-dx-prog-pm-tgen-gtex-gene-expression-rsem-tpm-uncorrected.rds" \
+--corrected_mat "output/pbta-hgat-dx-prog-pm-tgen-gtex-gene-expression-rsem-tpm-corrected.rds" \
+--combined_clin "output/pbta-hgat-dx-prog-pm-tgen-gtex-combined-clin.tsv" \
+--sample_id "identifier" \
+--tsne_plots "pbta-hgat-dx-prog-pm-tgen-gtex-tpm-tsne.pdf" \
+--density_plots "pbta-hgat-dx-prog-pm-tgen-gtex-tpm-density.pdf"
 ```
 
 ### Running the full analysis
 
 ```sh
-# pbta-hgat-dx analysis
-bash pbta-hgat-dx-analysis.sh
+# pbta-hgat-dx-prog-pm + tgen + gtex analysis
+bash pbta-hgat-dx-prog-pm-tgen-gtex-analysis.sh
 ```
 
 #### Output data
 
-All combined uncorrected and corrected matrices, combined clinical files and qc plots can be found here:
+All combined uncorrected and corrected matrices can be found here:
 
 ```sh
 # s3 location:
-s3://d3b-bix-dev-data-bucket/hgg-dmg-integration/merged_ngs_files/rna-seq/batch-corrected
+s3://d3b-bix-dev-data-bucket/hgg-dmg-integration/
 ```
 
