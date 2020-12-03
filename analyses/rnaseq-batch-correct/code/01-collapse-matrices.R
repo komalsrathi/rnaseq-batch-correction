@@ -39,4 +39,5 @@ if(gene_sym == TRUE){
 }
 
 # save output
+print(dim(mat.collapsed))
 saveRDS(mat.collapsed, file = outfile)

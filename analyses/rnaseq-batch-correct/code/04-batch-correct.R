@@ -20,6 +20,8 @@ option_list <- list(
               help = "Combined clinical file with multiple batches (.rds)"),
   make_option(c("--sample_id"), type = "character",
               help = "Sample identifiers matching between clinical and expression matrix"),
+  make_option(c("--type"), type = "character",
+              help = "Type of expression data: expected_count, FPKM or TPM"),
   make_option(c("--corrected_outfile"), type = "character",
               help = "Output filename (.RDS)"),
   make_option(c("--uncorrected_outfile"), type = "character", 
@@ -31,6 +33,7 @@ opt <- parse_args(OptionParser(option_list = option_list))
 combined_mat <- opt$combined_mat
 combined_clin <- opt$combined_clin
 sample_id <- opt$sample_id
+type <- opt$type
 corrected_outfile <- opt$corrected_outfile
 uncorrected_outfile <- opt$uncorrected_outfile
 corrected_outfile <- file.path(outdir, corrected_outfile)
@@ -62,9 +65,13 @@ if(!is.null(uncorrected_outfile)){
 
 # batch correct using ComBat (log2(TPM + 1))
 print("Batch correct uncorrected file..")
-corrected_mat <- ComBat(dat = log2(combined_mat + 1), batch = combined_clin$batch)
-corrected_mat <- 2^(corrected_mat) # back-transform
-corrected_mat <- as.data.frame(corrected_mat)
+if(type != "expected_count"){
+  corrected_mat <- ComBat(dat = log2(combined_mat + 1), batch = combined_clin$batch)
+  corrected_mat <- 2^(corrected_mat) # back-transform
+  corrected_mat <- as.data.frame(corrected_mat)
+} else {
+  corrected_mat <- ComBat_seq(counts = combined_mat, batch = combined_clin$batch)
+}
 
 print("Save corrected file..")
 print(dim(corrected_mat))

@@ -15,7 +15,7 @@ option_list <- list(
   make_option(c("--rsem_path"), type = "character",
               help = "Path to all RSEM genes.results files"),
   make_option(c("--type"), type = "character",
-              help = "TPM or FPKM"),
+              help = "TPM, FPKM or expected_count"),
   make_option(c("--outfile"), type = "character",
               help = "Output filename (.RDS)"))
 
