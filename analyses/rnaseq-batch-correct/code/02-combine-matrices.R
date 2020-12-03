@@ -13,7 +13,7 @@ outdir <- outdir <- file.path(root_dir, "analyses", "rnaseq-batch-correct", "out
 # parameters
 option_list <- list(
   make_option(c("--matrices"), type = "character",
-              help = "Comma separated list of expression matrices to combine (RSEM TPM) (.RDS)"),
+              help = "Comma separated list of expression matrices to combine (RSEM TPM, FPM or Expected counts) (.RDS)"),
   make_option(c("--outfile"), type = "character",
               help = "Output filename (.RDS)"))
 

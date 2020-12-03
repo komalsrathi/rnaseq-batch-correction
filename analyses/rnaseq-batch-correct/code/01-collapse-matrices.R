@@ -14,7 +14,7 @@ outdir <- file.path(root_dir, "analyses", "rnaseq-batch-correct", "output/")
 # parameters
 option_list <- list(
   make_option(c("--mat"), type = "character",
-              help = "Expression Matrix (RSEM TPM or FPKM) (.rds)"),
+              help = "Expression Matrix (RSEM TPM, FPKM or Expected counts) (.rds)"),
   make_option(c("--gene_sym"),  type = "logical",
               help = "Is gene symbol present?"),
   make_option(c("--outfile"), type = "character",
