@@ -47,7 +47,7 @@ Rscript code/04-batch-correct.R \
 # correct count matrices
 Rscript code/04-batch-correct.R \
 --combined_mat "output/pbta-tgen-gtex-gene-counts-rsem-expected_count-collapsed.combined.rds" \
---combined_clin "output/pbta-hgat-dx-prog-pm-tgen-gtex-combined-clin.tsv" \
+--combined_clin "output/pbta-hgat-dx-prog-pm-tgen-gtex-combined-clin-forcounts.tsv" \
 --sample_id "identifier" \
 --type "expected_count" \
 --corrected_outfile "pbta-hgat-dx-prog-pm-tgen-gtex-gene-counts-rsem-expected_count-corrected.rds" \
@@ -62,3 +62,12 @@ Rscript code/05-qc-plots.R \
 --sample_id "identifier" \
 --tsne_plots pbta-hgat-dx-prog-pm-tgen-gtex-tpm-tsne.pdf \
 --density_plots pbta-hgat-dx-prog-pm-tgen-gtex-tpm-density.pdf
+
+# corrected count matrices
+Rscript code/05-qc-plots.R \
+--uncorrected_mat output/pbta-hgat-dx-prog-pm-tgen-gtex-gene-counts-rsem-expected_count-uncorrected.rds \
+--corrected_mat output/pbta-hgat-dx-prog-pm-tgen-gtex-gene-counts-rsem-expected_count-corrected.rds \
+--combined_clin output/pbta-hgat-dx-prog-pm-tgen-gtex-combined-clin-forcounts.tsv \
+--sample_id "identifier" \
+--tsne_plots pbta-hgat-dx-prog-pm-tgen-gtex-expected_count-tsne.pdf \
+--density_plots pbta-hgat-dx-prog-pm-tgen-gtex-expected_count-density.pdf

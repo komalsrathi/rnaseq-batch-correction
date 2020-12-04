@@ -81,7 +81,7 @@ uncorrected_mat.hk <- uncorrected_mat.hk %>%
 p <- density.plot(mat = uncorrected_mat.hk, 
                var = 'batch', 
                title = 'House Keeping Genes (Before ComBat correction)',
-               xlab = 'log2(TPM + 1)')
+               xlab = 'log2(Uncorrected value + 1)')
 
 # corrected mat
 corrected_mat.hk <- corrected_mat.hk %>% 

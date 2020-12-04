@@ -70,7 +70,7 @@ if(type != "expected_count"){
   corrected_mat <- 2^(corrected_mat) # back-transform
   corrected_mat <- as.data.frame(corrected_mat)
 } else {
-  corrected_mat <- ComBat_seq(counts = combined_mat, batch = combined_clin$batch)
+  corrected_mat <- ComBat_seq(counts = as.matrix(combined_mat), batch = combined_clin$batch)
 }
 
 print("Save corrected file..")
