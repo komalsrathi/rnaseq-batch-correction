@@ -85,11 +85,20 @@ if(dummy == 'existing_clinical'){
     clin <- clin %>%
       filter(!is.na(get(cohort_col)))
   }
-  clin <- clin %>%
-    filter(experimental_strategy == 'RNA-Seq') %>%
-    mutate(batch = paste0(get(study_col), '_', get(lib_col)),
-           identifier = get(id_col)) %>%
-    dplyr::select(identifier, batch)
+  if(study_col != ""){
+    clin <- clin %>%
+      filter(experimental_strategy == 'RNA-Seq') %>%
+      mutate(batch = paste0(get(study_col), '_', get(lib_col)),
+             identifier = get(id_col)) %>%
+      dplyr::select(identifier, batch)
+  } else {
+    clin <- clin %>%
+      filter(experimental_strategy == 'RNA-Seq') %>%
+      mutate(batch = get(lib_col),
+             identifier = get(id_col)) %>%
+      dplyr::select(identifier, batch)
+  }
+  
 }
 
 # save output

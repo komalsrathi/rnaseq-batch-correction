@@ -1,4 +1,6 @@
 # step1: subset clinical file to RNA-seq and pbta-hgat-dx-prog-pm + create batch column using RNA_library and cohort
+# create clinical file for tpm based batch correction
+# for tpm based batch correction, we are using batch as a combination of study_id + rna_library
 Rscript code/02-create-clin.R \
 --clin "input/pbta-histologies.tsv" \
 --cohort_col "pbta-hgat-dx-prog-pm" \
@@ -12,6 +14,22 @@ Rscript code/02-create-clin.R \
 # BS_ASM7ANKQ	CBTN_stranded
 echo "BS_00FD2KMP	PNOC008_rna_exome" >> input/pbta-hgat-dx-prog-pm_histology_annotation.tsv
 echo "BS_ASM7ANKQ	CBTN_stranded" >> input/pbta-hgat-dx-prog-pm_histology_annotation.tsv
+
+# create clinical file for count based batch correction
+# for count based batch correction, we are using batch only with rna_library. Issue discussed here: https://github.com/d3b-center/bixu-tracker/issues/875#issuecomment-738814246
+Rscript code/02-create-clin.R \
+--clin "input/pbta-histologies.tsv" \
+--cohort_col "pbta-hgat-dx-prog-pm" \
+--id_col "Kids_First_Biospecimen_ID" \
+--lib_col "RNA_library" \
+--study_col "" \
+--outfile "pbta-hgat-dx-prog-pm_histology_annotation-forcounts.tsv"
+
+# adding the two additional samples manually: PNOC008-23 (BS_00FD2KMP) and PT_SMJNYRBK (BS_ASM7ANKQ)
+# BS_00FD2KMP	rna_exome
+# BS_ASM7ANKQ	stranded
+echo "BS_00FD2KMP	rna_exome" >> input/pbta-hgat-dx-prog-pm_histology_annotation-forcounts.tsv
+echo "BS_ASM7ANKQ	stranded" >> input/pbta-hgat-dx-prog-pm_histology_annotation-forcounts.tsv
 
 # step2: combine matrices
 # combine tpm matrices
